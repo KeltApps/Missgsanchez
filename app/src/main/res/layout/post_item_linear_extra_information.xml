@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/extraInformation.LinearLayout.height"
+    android:layout_alignParentBottom="true"
+    android:background="@android:color/white"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    tools:ignore="ContentDescription">
+
+    <ImageView
+        android:id="@+id/extraInformation_imageView_logo"
+        android:layout_width="@dimen/extraInformation.LinearLayout.height"
+        android:layout_height="@dimen/extraInformation.LinearLayout.height"
+        android:layout_marginEnd="@dimen/extraInformation.marginBetween"
+        android:layout_marginRight="@dimen/extraInformation.marginBetween"
+        android:src="@android:drawable/sym_def_app_icon" />
+
+    <ImageView
+        android:id="@+id/extraInformation_imageView_time"
+        android:layout_width="@dimen/extraInformation.LinearLayout.height"
+        android:layout_height="@dimen/extraInformation.LinearLayout.height"
+        android:src="@android:drawable/btn_radio" />
+
+    <TextView
+        android:id="@+id/extraInformation_textView_time"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/extraInformation.LinearLayout.height"
+        android:layout_marginEnd="@dimen/extraInformation.marginBetween"
+        android:layout_marginRight="@dimen/extraInformation.marginBetween"
+        android:gravity="center_vertical" />
+
+    <ImageView
+        android:id="@+id/extraInformation_imageView_comments"
+        android:layout_width="@dimen/extraInformation.LinearLayout.height"
+        android:layout_height="@dimen/extraInformation.LinearLayout.height"
+        android:src="@android:drawable/btn_radio" />
+
+    <TextView
+        android:id="@+id/extraInformation_textView_comments"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/extraInformation.LinearLayout.height"
+        android:gravity="center_vertical" />
+</LinearLayout>

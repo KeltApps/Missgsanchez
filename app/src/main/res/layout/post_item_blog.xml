@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_blog_cardView"
+    style="@style/Card_View"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/cardView.height"
+    android:foreground="?attr/selectableItemBackground"
+    card_view:cardUseCompatPadding="true"
+    tools:ignore="ContentDescription">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/item_blog_imageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@android:drawable/sym_def_app_icon" />
+
+        <include layout="@layout/post_item_linear_title" />
+
+        <include layout="@layout/post_item_linear_extra_information" />
+    </RelativeLayout>
+</android.support.v7.widget.CardView>
