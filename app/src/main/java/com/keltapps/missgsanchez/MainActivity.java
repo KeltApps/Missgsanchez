@@ -9,13 +9,23 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.keltapps.missgsanchez.fragments.PostFragment;
+import com.keltapps.missgsanchez.fragments.SplashFragment;
+import com.keltapps.missgsanchez.models.Rss;
+import com.keltapps.missgsanchez.network.VolleySingleton;
+import com.keltapps.missgsanchez.network.XmlRequest;
+import com.keltapps.missgsanchez.utils.FeedDatabase;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String URL_FEED = "http://www.missgsanchez.com/feed";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +45,40 @@ public class MainActivity extends AppCompatActivity
 
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        PostFragment postFragment = new PostFragment();
-        fragmentTransaction.add(R.id.fragment_container, postFragment, getString(R.string.fragment_postFragment));
+        SplashFragment splashFragment = new SplashFragment();
+        fragmentTransaction.add(R.id.fragment_container, splashFragment, getString(R.string.fragment_splashFragment));
         fragmentTransaction.commit();
+
+
+
+
+        VolleySingleton.getInstance(this).addToRequestQueue(
+                new XmlRequest<>(
+                        URL_FEED,
+                        Rss.class,
+                        null,
+                        new Response.Listener<Rss>() {
+                            @Override
+                            public void onResponse(Rss response) {
+                                // Caching
+                                FeedDatabase.getInstance(MainActivity.this).
+                                        sincronizarEntradas(response.getChannel().getItems());
+                                // Carga inicial de datos...
+                               FragmentManager fragmentManager = getFragmentManager();
+                                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                                PostFragment postFragment = new PostFragment();
+                                fragmentTransaction.replace(R.id.fragment_container, postFragment, getString(R.string.fragment_postFragment));
+                                fragmentTransaction.commit();
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.d(TAG, "Error Volley: " + error.getMessage());
+                            }
+                        }
+                )
+        );
     }
 
     @Override
@@ -96,4 +137,6 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
 }

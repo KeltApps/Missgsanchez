@@ -1,4 +1,4 @@
-package com.keltapps.missgsanchez.views;
+package com.keltapps.missgsanchez.models;
 
 import java.util.Date;
 
