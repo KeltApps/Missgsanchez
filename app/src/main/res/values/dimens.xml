@@ -18,5 +18,8 @@
     <dimen name="cardView.margin.top">5dp</dimen>
     <!--LinearLayout extra information -->
     <dimen name="extraInformation.LinearLayout.height">30dp</dimen>
+    <dimen name="extraInformation.marginIcon">5dp</dimen>
     <dimen name="extraInformation.marginBetween">10dp</dimen>
+    <!--Item load more -->
+    <dimen name="LoadMore.marginProgress">10dp</dimen>
 </resources>

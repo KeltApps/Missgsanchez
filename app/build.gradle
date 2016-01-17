@@ -28,4 +28,5 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.mcxiaoke.volley:library:1.0.+'
     compile files('libs/simple-xml-2.7.1.jar')
+    compile 'org.jsoup:jsoup:1.7.3'
 }

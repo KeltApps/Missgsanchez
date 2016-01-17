@@ -13,22 +13,29 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.keltapps.missgsanchez.fragments.PostFragment;
 import com.keltapps.missgsanchez.fragments.SplashFragment;
-import com.keltapps.missgsanchez.models.Rss;
 import com.keltapps.missgsanchez.network.VolleySingleton;
-import com.keltapps.missgsanchez.network.XmlRequest;
 import com.keltapps.missgsanchez.utils.FeedDatabase;
+
+import org.jsoup.Jsoup;
+
+import java.io.UnsupportedEncodingException;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = MainActivity.class.getSimpleName();
+    public static final String TAG_ARGS_OLD_POST = "old_post";
+    public static final String TAG_ARGS_CONNECTION = "connection";
     private static final String URL_FEED = "http://www.missgsanchez.com/feed";
+    public static final String URL_HTTP = "http://www.missgsanchez.com";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -42,43 +49,52 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        if (savedInstanceState == null) {
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            SplashFragment splashFragment = new SplashFragment();
+            fragmentTransaction.add(R.id.fragment_container, splashFragment, getString(R.string.fragment_splashFragment));
+            fragmentTransaction.commit();
+        }
 
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        SplashFragment splashFragment = new SplashFragment();
-        fragmentTransaction.add(R.id.fragment_container, splashFragment, getString(R.string.fragment_splashFragment));
-        fragmentTransaction.commit();
-
-
-
-
-        VolleySingleton.getInstance(this).addToRequestQueue(
-                new XmlRequest<>(
-                        URL_FEED,
-                        Rss.class,
-                        null,
-                        new Response.Listener<Rss>() {
-                            @Override
-                            public void onResponse(Rss response) {
-                                // Caching
-                                FeedDatabase.getInstance(MainActivity.this).
-                                        sincronizarEntradas(response.getChannel().getItems());
-                                // Carga inicial de datos...
-                               FragmentManager fragmentManager = getFragmentManager();
-                                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                                PostFragment postFragment = new PostFragment();
-                                fragmentTransaction.replace(R.id.fragment_container, postFragment, getString(R.string.fragment_postFragment));
-                                fragmentTransaction.commit();
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Log.d(TAG, "Error Volley: " + error.getMessage());
+        VolleySingleton.getInstance(this).addToRequestQueue(new StringRequest(Request.Method.GET, URL_HTTP,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String data) {
+                        boolean oldPost = FeedDatabase.getInstance(MainActivity.this).
+                                synchronizeEntries(Jsoup.parse(data));
+                        if (savedInstanceState == null)
+                            changeToPostFragment(oldPost, true);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        // Handle error
+                        if(volleyError.networkResponse.data!=null) {
+                            try {
+                                Log.v("prueba", "Error volley: " + new String(volleyError.networkResponse.data, "UTF-8"));
+                            } catch (UnsupportedEncodingException e) {
+                                e.printStackTrace();
                             }
                         }
-                )
-        );
+                        if (savedInstanceState == null)
+                            changeToPostFragment(true, false);
+                    }
+                }
+        ));
+    }
+
+    private void changeToPostFragment(boolean oldPost, boolean connection) {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        PostFragment postFragment = new PostFragment();
+        Bundle args = new Bundle();
+        args.putBoolean(TAG_ARGS_OLD_POST, oldPost);
+        args.putBoolean(TAG_ARGS_CONNECTION, connection);
+        postFragment.setArguments(args);
+        fragmentTransaction.replace(R.id.fragment_container, postFragment, getString(R.string.fragment_postFragment));
+        fragmentTransaction.commit();
     }
 
     @Override

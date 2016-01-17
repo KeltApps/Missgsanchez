@@ -9,4 +9,6 @@
     <!--Fragments names-->
     <string name="fragment.postFragment">PostFragment</string>
     <string name="fragment.splashFragment">SplashFragment</string>
+    
+    <string name="loadMore.post">Loading more post...</string>
 </resources>

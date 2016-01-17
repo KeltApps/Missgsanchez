@@ -5,6 +5,9 @@ import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.database.MergeCursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,71 +18,136 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.keltapps.missgsanchez.MainActivity;
 import com.keltapps.missgsanchez.R;
+import com.keltapps.missgsanchez.network.VolleySingleton;
 import com.keltapps.missgsanchez.utils.EntryProvider;
+import com.keltapps.missgsanchez.utils.FeedDatabase;
 import com.keltapps.missgsanchez.utils.ScriptDatabase;
 import com.keltapps.missgsanchez.views.adapters.PostAdapter;
 
+import org.jsoup.Jsoup;
+
 
 public class PostFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static final String TAG = PostAdapter.class.getSimpleName();
+    private static final String TAG_LIMIT_QUERY = "limit_query";
     RecyclerView recyclerView;
     PostAdapter postAdapter;
+    boolean loading = true;
+    int loader_id = 0;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-
-        Log.v("prueba", "on create view");
         View rootView = inflater.inflate(R.layout.fragment_post, container, false);
-
-        getLoaderManager().initLoader(1, null, this);
-
+        Bundle args = getArguments();
+        sqlQuery(args.getBoolean(MainActivity.TAG_ARGS_OLD_POST),0);
         recyclerView = (RecyclerView) rootView.findViewById(R.id.post_fragment_recyclerView);
-        // Cursor cursor = FeedDatabase.getInstance(getActivity()).getEntries();
-        //Log.v("prueba","count: " + cursor.getCount());
-
-
         postAdapter = new PostAdapter(getActivity(), null);
         recyclerView.setAdapter(postAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayout.VERTICAL, false));
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayout.VERTICAL, false);
+        recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-/*
-        BlogItem blogItem = new BlogItem();
-        blogItem.setImageLink("http://www.missgsanchez.com/wp-content/uploads/2015/11/missglemien3-680x450.jpg");
-        blogItem.setCounterComments(3);
-        Calendar c = Calendar.getInstance();
-        blogItem.setDatePost(c.getTime());
-        blogItem.setTittle("Copenhagen-DAY 2");
-        listBlogItem.add(blogItem);
+        if (args.getBoolean(MainActivity.TAG_ARGS_CONNECTION))
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    if (dy > 0) //check for scroll down
+                    {
+                        int visibleItemCount = linearLayoutManager.getChildCount();
+                        final int totalItemCount = linearLayoutManager.getItemCount();
+                        int pastVisibleItems = linearLayoutManager.findFirstVisibleItemPosition();
 
-        listBlogItem.add(blogItem);
-        listBlogItem.add(blogItem);
-        listBlogItem.add(blogItem);
-        listBlogItem.add(blogItem);
-        listBlogItem.add(blogItem);
-        listBlogItem.add(blogItem);
+                        if (loading) {
+                            if ((visibleItemCount + pastVisibleItems) >= totalItemCount - 2) {
+                                loading = false;
+                                int numberPage = (int) Math.floor(totalItemCount / FeedDatabase.POST_PER_PAGE) + 1;
+                                if(FeedDatabase.nextPage != null)
+                                VolleySingleton.getInstance(getActivity()).addToRequestQueue(new StringRequest(Request.Method.GET, MainActivity.URL_HTTP + "/page/" + numberPage,
+                                        new Response.Listener<String>() {
+                                            @Override
+                                            public void onResponse(String data) {
+                                                sqlQuery(FeedDatabase.getInstance(getActivity()).
+                                                        synchronizeEntries(Jsoup.parse(data)),totalItemCount);
+                                            }
+                                        },
+                                        new Response.ErrorListener() {
+                                            @Override
+                                            public void onErrorResponse(VolleyError volleyError) {
+                                                // Handle error
+                                                Log.d(TAG, "Error Volley: " + volleyError.getMessage());
+                                                FeedDatabase.nextPage = null;
+                                                sqlQuery(true, 0);
+                                            }
+                                        }
+                                ));
+                            }
+                        }
+                    }
+                }
+            });
 
-*/
-
-        Log.v("prueba", "on create view final");
-
+      //  inflater.inflate(R.layout.item_load_more,container);
         return rootView;
     }
+/*
+    @Override
+    public void onDetach() {
+        super.onDetach();
 
+        try {
+            Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+            childFragmentManager.setAccessible(true);
+            childFragmentManager.set(this, null);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }*/
+
+    private void sqlQuery(boolean oldPost, int totalItemCount) {
+        Bundle bundle = new Bundle();
+        if (oldPost) {
+            bundle.putInt(TAG_LIMIT_QUERY, 0);
+            getLoaderManager().initLoader(loader_id, bundle, this);
+        } else {
+            bundle.putInt(TAG_LIMIT_QUERY, totalItemCount + FeedDatabase.POST_PER_PAGE);
+            getLoaderManager().initLoader(loader_id, bundle, this);
+        }
+        loader_id++;
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(getActivity(), EntryProvider.CONTENT_URI, null, null, null, ScriptDatabase.ColumnEntries.DATE + " DESC");
+        if ((int) args.get(TAG_LIMIT_QUERY) == 0)
+            return new CursorLoader(getActivity(), EntryProvider.CONTENT_URI, null, null, null, ScriptDatabase.ColumnEntries.DATE_FORMATTED + " DESC");
+        else
+            return new CursorLoader(getActivity(), Uri.parse(EntryProvider.CONTENT_URI_LIMIT+"/" + args.get(TAG_LIMIT_QUERY)), null, null, null, ScriptDatabase.ColumnEntries.DATE_FORMATTED + " DESC");
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        postAdapter.swapCursor(data);
+        //Add the "load more" element
+        if(FeedDatabase.nextPage != null) {
+            MatrixCursor matrixCursor = new MatrixCursor(new String[]{ScriptDatabase.ColumnEntries.ID});
+            matrixCursor.addRow(new String[]{"-1"});
+            Cursor[] cursors = {data, matrixCursor};
+            Cursor extendedCursor = new MergeCursor(cursors);
+            postAdapter.swapCursor(extendedCursor);
+            loading = true;
+        }else
+            postAdapter.swapCursor(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        postAdapter.swapCursor(null);
     }
 
 }
