@@ -25,17 +25,18 @@
         android:layout_marginLeft="@dimen/extraInformation.marginIcon"
         android:layout_marginRight="@dimen/extraInformation.marginBetween"
         android:layout_marginStart="@dimen/extraInformation.marginIcon"
-        android:gravity="center_vertical" />
+        android:gravity="center_vertical"
+        tools:text="2 days ago"/>
 
     <ImageView
-        android:id="@+id/extraInformation_imageView_comments"
+        android:id="@+id/extraInformation_imageView_photo"
         style="@style/ImageView_Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_comment_black_18dp" />
+        android:src="@drawable/ic_photo_library_black_18dp" />
 
     <TextView
-        android:id="@+id/extraInformation_textView_comments"
+        android:id="@+id/extraInformation_textView_photo"
         style="@style/Text_Black_Body"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/extraInformation.LinearLayout.height"
@@ -43,5 +44,7 @@
         android:layout_marginLeft="@dimen/extraInformation.marginIcon"
         android:layout_marginRight="@dimen/extraInformation.marginBetween"
         android:layout_marginStart="@dimen/extraInformation.marginIcon"
-        android:gravity="center_vertical" />
+        android:gravity="center_vertical"
+        tools:text="2 / 5"/>
+
 </LinearLayout>

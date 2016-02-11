@@ -1,53 +1,75 @@
 package com.keltapps.missgsanchez.models;
 
-import java.util.Date;
+import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
 
 
 public class BlogItem {
-    private String imageLink;
-    private String tittle;
-    private Date datePost;
-    private int counterComments;
+    @SerializedName("id")
+    private int idPost;
+    @SerializedName("title")
+    private JSONRendered jsonRenderedTitle;
+    @SerializedName("date_gmt")
+    private String datePost;
+    private transient List<String> listPhotos;
+    @SerializedName("content")
+    private JSONRendered jsonRenderedContent;
 
-    public BlogItem() {
+
+
+    public int getIdPost() {
+        return idPost;
     }
 
-    public BlogItem(String imageLink, String tittle, Date datePost, int counterComments) {
-        this.imageLink = imageLink;
-        this.tittle = tittle;
-        this.datePost = datePost;
-        this.counterComments = counterComments;
+    public void setIdPost(int idPost) {
+        this.idPost = idPost;
     }
 
-    public String getImageLink() {
-        return imageLink;
+    public JSONRendered getJsonRenderedTitle() {
+        return jsonRenderedTitle;
     }
 
-    public void setImageLink(String imageLink) {
-        this.imageLink = imageLink;
+    public void setJsonRenderedTitle(JSONRendered jsonRenderedTitle) {
+        this.jsonRenderedTitle = jsonRenderedTitle;
     }
 
-    public String getTittle() {
-        return tittle;
-    }
-
-    public void setTittle(String tittle) {
-        this.tittle = tittle;
-    }
-
-    public Date getDatePost() {
+    public String getDatePost() {
         return datePost;
     }
 
-    public void setDatePost(Date datePost) {
+    public void setDatePost(String datePost) {
         this.datePost = datePost;
     }
 
-    public int getCounterComments() {
-        return counterComments;
+    public List<String> getListPhotos() {
+        return listPhotos;
     }
 
-    public void setCounterComments(int counterComments) {
-        this.counterComments = counterComments;
+    public JSONRendered getJsonRenderedContent() {
+        return jsonRenderedContent;
     }
+
+    public void setJsonRenderedContent(JSONRendered jsonRenderedContent) {
+        this.jsonRenderedContent = jsonRenderedContent;
+    }
+
+    public void setListPhotos(List<String> listPhotos) {
+        this.listPhotos = listPhotos;
+    }
+
+
+    public class JSONRendered {
+        @SerializedName("rendered")
+        private String string;
+
+        public String getString() {
+            return string;
+        }
+
+        public void setString(String string) {
+            this.string = string;
+        }
+    }
+
 }

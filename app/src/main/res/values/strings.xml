@@ -11,4 +11,15 @@
     <string name="fragment.splashFragment">SplashFragment</string>
     
     <string name="loadMore.post">Loading more post...</string>
+
+    <!--Time-->
+    <string name="time.ago">ago</string>
+    <string name="time.day">day</string>
+    <string name="time.days">days</string>
+    <string name="time.hour">hour</string>
+    <string name="time.hours">hours</string>
+    <string name="time.minute">minute</string>
+    <string name="time.minutes">minutes</string>
+    <string name="time.second">second</string>
+    <string name="time.seconds">seconds</string>
 </resources>

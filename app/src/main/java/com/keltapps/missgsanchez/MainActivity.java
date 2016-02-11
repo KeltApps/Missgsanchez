@@ -1,9 +1,9 @@
 package com.keltapps.missgsanchez;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -22,17 +22,9 @@ import com.keltapps.missgsanchez.fragments.SplashFragment;
 import com.keltapps.missgsanchez.network.VolleySingleton;
 import com.keltapps.missgsanchez.utils.FeedDatabase;
 
-import org.jsoup.Jsoup;
-
-import java.io.UnsupportedEncodingException;
-
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = MainActivity.class.getSimpleName();
-    public static final String TAG_ARGS_OLD_POST = "old_post";
-    public static final String TAG_ARGS_CONNECTION = "connection";
-    private static final String URL_FEED = "http://www.missgsanchez.com/feed";
-    public static final String URL_HTTP = "http://www.missgsanchez.com";
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -50,19 +42,21 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         if (savedInstanceState == null) {
-            FragmentManager fragmentManager = getFragmentManager();
+            FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             SplashFragment splashFragment = new SplashFragment();
             fragmentTransaction.add(R.id.fragment_container, splashFragment, getString(R.string.fragment_splashFragment));
             fragmentTransaction.commit();
         }
 
-        VolleySingleton.getInstance(this).addToRequestQueue(new StringRequest(Request.Method.GET, URL_HTTP,
+        VolleySingleton.getInstance(this).addToRequestQueue(new StringRequest(Request.Method.GET, VolleySingleton.URL_GET_POSTS + 0,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String data) {
-                        boolean oldPost = FeedDatabase.getInstance(MainActivity.this).
-                                synchronizeEntries(Jsoup.parse(data));
+                        int returnSynchronize = FeedDatabase.getInstance(MainActivity.this).synchronizeEntries(data);
+                        if (returnSynchronize == FeedDatabase.RETURN_EMPTY_PAGE)
+                            return;
+                        boolean oldPost = returnSynchronize == FeedDatabase.RETURN_OLD_POST;
                         if (savedInstanceState == null)
                             changeToPostFragment(oldPost, true);
                     }
@@ -71,13 +65,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         // Handle error
-                        if(volleyError.networkResponse.data!=null) {
-                            try {
-                                Log.v("prueba", "Error volley: " + new String(volleyError.networkResponse.data, "UTF-8"));
-                            } catch (UnsupportedEncodingException e) {
-                                e.printStackTrace();
-                            }
-                        }
+                        Log.v("prueba", "Error volley: " + volleyError);
                         if (savedInstanceState == null)
                             changeToPostFragment(true, false);
                     }
@@ -86,15 +74,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void changeToPostFragment(boolean oldPost, boolean connection) {
-        FragmentManager fragmentManager = getFragmentManager();
+        FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         PostFragment postFragment = new PostFragment();
         Bundle args = new Bundle();
-        args.putBoolean(TAG_ARGS_OLD_POST, oldPost);
-        args.putBoolean(TAG_ARGS_CONNECTION, connection);
+        args.putBoolean(PostFragment.TAG_ARGS_OLD_POST, oldPost);
+        args.putBoolean(PostFragment.TAG_ARGS_CONNECTION, connection);
         postFragment.setArguments(args);
         fragmentTransaction.replace(R.id.fragment_container, postFragment, getString(R.string.fragment_postFragment));
-        fragmentTransaction.commit();
+        fragmentTransaction.commitAllowingStateLoss();
     }
 
     @Override

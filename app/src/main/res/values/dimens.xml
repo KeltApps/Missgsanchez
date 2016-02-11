@@ -11,7 +11,7 @@
     <dimen name="size.text.subheading">16sp</dimen>
     <dimen name="size.text.body">14sp</dimen>
     <!--CardView -->
-    <dimen name="cardView.height">350dp</dimen>
+    <dimen name="cardView.height">425dp</dimen>
     <dimen name="cardView.cardElevation">2dp</dimen>
     <dimen name="cardView.cornerRadius">2dp</dimen>
     <dimen name="cardView.margin.horizontal">8dp</dimen>
