@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
+
 /**
  * Created by sergio on 13/01/16 for KelpApps.
  */
@@ -63,6 +64,55 @@ public class LoadImages {
                                     .load(urlLowResolution)
                                     .fit()
                                     .centerCrop()
+                                    .into(imageView);
+                        }
+                    });
+        }
+    }
+    public static void setImageCenterInside(final Context context, final String urlFullResolution, final String urlLowResolution, final ImageView imageView) {
+        final Picasso picasso = Picasso.with(context);
+        // picasso.setIndicatorsEnabled(true);
+
+
+
+        ConnectivityManager connMgr = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if ((networkInfo != null) && (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_ETHERNET)) {
+            picasso.load(urlFullResolution)
+                    .fit()
+                    .centerInside()
+                    .into(imageView, new com.squareup.picasso.Callback() {
+                        @Override
+                        public void onSuccess() {
+                        }
+
+                        @Override
+                        public void onError() {
+                            picasso.with(context)
+                                    .load(urlLowResolution)
+                                    .fit()
+                                    .centerInside()
+                                    .into(imageView);
+                        }
+                    });
+
+        } else {
+            picasso.load(urlFullResolution)
+                    .networkPolicy(NetworkPolicy.OFFLINE)
+                    .fit()
+                    .centerInside()
+                    .into(imageView, new com.squareup.picasso.Callback() {
+                        @Override
+                        public void onSuccess() {
+                        }
+
+                        @Override
+                        public void onError() {
+                            picasso.with(context)
+                                    .load(urlLowResolution)
+                                    .fit()
+                                    .centerInside()
                                     .into(imageView);
                         }
                     });

@@ -20,18 +20,21 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.keltapps.missgsanchez.R;
-import com.keltapps.missgsanchez.fragments.PostFragment;
+import com.keltapps.missgsanchez.fragments.BlogPageFragment;
 import com.keltapps.missgsanchez.models.ViewHolderLoad;
 import com.keltapps.missgsanchez.network.LoadImages;
+import com.keltapps.missgsanchez.network.VolleySingleton;
 import com.keltapps.missgsanchez.utils.EntryProvider;
 import com.keltapps.missgsanchez.utils.ScriptDatabase;
 import com.keltapps.missgsanchez.views.DepthPageTransformer;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHolder> {
@@ -67,19 +70,19 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
         switch (viewType) {
             case TYPE_REGULAR:
                 return new ViewHolderPost(context, LayoutInflater.from(viewGroup.getContext())
-                        .inflate(R.layout.post_item_blog, viewGroup, false), mapCursor);
+                        .inflate(R.layout.item_blog, viewGroup, false), mapCursor);
             case TYPE_LOAD:
                 return new ViewHolderLoad(LayoutInflater.from(viewGroup.getContext())
                         .inflate(R.layout.item_load_more, viewGroup, false));
             default:
                 return new ViewHolderPost(context, LayoutInflater.from(viewGroup.getContext())
-                        .inflate(R.layout.post_item_blog, viewGroup, false), mapCursor);
+                        .inflate(R.layout.item_blog, viewGroup, false), mapCursor);
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (getCursor() == null || PostFragment.noMorePages)
+        if (getCursor() == null || BlogPageFragment.noMorePages)
             return TYPE_REGULAR;
         return getCursor().getCount() - 1 == position ? TYPE_LOAD : TYPE_REGULAR;
 
@@ -95,6 +98,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
         private static String TAG_ID_POST = "id_post";
         private static String TAG = ViewHolderPost.class.getSimpleName();
         Context context;
+        View container;
         TextView title;
         TextView time;
         TextView photo;
@@ -102,10 +106,16 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
         public ViewPager mPager;
         private CursorPagerAdapter cursorPagerAdapter;
         HashMap<Integer, Cursor> mapCursor;
+        View includeTitleBackground;
+        View includeExtraBackground;
+        View includeExtraTimeImage;
+        View includeExtraPhotoImage;
+        int positionCursorPhotos = 0;
 
 
         public ViewHolderPost(Context context, View itemView, HashMap<Integer, Cursor> mapCursor) {
             super(itemView);
+            container = itemView.findViewById(R.id.item_blog_cardView);
             title = (TextView) itemView.findViewById(R.id.linear_title_textView);
             time = (TextView) itemView.findViewById(R.id.extraInformation_textView_time);
             photo = (TextView) itemView.findViewById(R.id.extraInformation_textView_photo);
@@ -113,16 +123,20 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
             this.context = context;
             mPager = (ViewPager) itemView.findViewById(R.id.post_item_pager);
             this.mapCursor = mapCursor;
+            includeTitleBackground = itemView.findViewById(R.id.linear_title_container);
+            includeExtraBackground = itemView.findViewById(R.id.extraInformation_container);
+            includeExtraTimeImage = itemView.findViewById(R.id.extraInformation_imageView_time);
+            includeExtraPhotoImage = itemView.findViewById(R.id.extraInformation_imageView_photo);
         }
 
-        public void bindProfile(Context context, Cursor cursor, HashMap<Integer, Integer> mapState) {
+        public void bindProfile(final Context context, final Cursor cursor, HashMap<Integer, Integer> mapState) {
             title.setText(cursor.getString(cursor.getColumnIndex(ScriptDatabase.ColumnEntries.TITLE)));
             time.setText(getDifferenceTime(context, cursor.getString(cursor.getColumnIndex(ScriptDatabase.ColumnEntries.DATE))));
             mPager.setPageTransformer(true, new DepthPageTransformer());
-            Cursor cursorPhotos = mapCursor.get(getAdapterPosition());
-            if(cursorPhotos != null)
+            final Cursor cursorPhotos = mapCursor.get(getAdapterPosition());
+            if (cursorPhotos != null)
                 photo.setText("1 / " + cursorPhotos.getCount());
-            cursorPagerAdapter = new CursorPagerAdapter(cursorPhotos);
+            cursorPagerAdapter = new CursorPagerAdapter(cursor, cursorPhotos);
             mPager.setAdapter(cursorPagerAdapter);
             Integer adapterPosition = mapState.get(getAdapterPosition());
             if (adapterPosition != null)
@@ -136,8 +150,16 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
                 @Override
                 public void onPageSelected(final int position) {
                     String text = photo.getText().toString();
-                    text = text.substring(1);
-                    photo.setText((position+1) + text);
+                    text = text.substring(text.indexOf("/"));
+                    photo.setText((position + 1) + " " + text);
+                    positionCursorPhotos = position;
+                }
+            });
+            container.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    changeInsideFragment(cursor, getAdapterPosition(), positionCursorPhotos);
                 }
             });
         }
@@ -221,27 +243,56 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
         }
 
 
+        private void changeInsideFragment(Cursor cursor, int position, int positionCursorPhotos) {
+            List<String> listPhotos = new ArrayList<>();
+            Cursor cursorPhotos = cursorPagerAdapter.getCursorPhotos();
+            int cursorPhotosPosition = cursorPhotos.getPosition();
+            if (cursorPhotos.moveToFirst()) {
+                do {
+                    listPhotos.add(cursorPhotos.getString(cursorPhotos.getColumnIndex(ScriptDatabase.ColumnPhotosBlog.URL)));
+                } while (cursorPhotos.moveToNext());
+            }
+            cursorPagerAdapter.getCursorPhotos().moveToPosition(cursorPhotosPosition);
+            int cursorPosition = cursor.getPosition();
+            cursor.moveToPosition(position);
+            ((BlogPageFragment.OnPostExpandListener) context).onClickPostListener(listPhotos, positionCursorPhotos, time.getText().toString(),
+                    title.getText().toString(),
+                    cursor.getString(cursor.getColumnIndex(ScriptDatabase.ColumnEntries.TEXT)),
+                    cursor.getString(cursor.getColumnIndex(ScriptDatabase.ColumnEntries.URL)));
+            cursor.moveToPosition(cursorPosition);
+        }
+
+
         private class CursorPagerAdapter extends PagerAdapter {
             public Cursor cursor;
+            public Cursor cursorPhotos;
             private LayoutInflater inflater;
 
-            public CursorPagerAdapter(Cursor cursor) {
+            public CursorPagerAdapter(Cursor cursor, Cursor cursorPhotos) {
                 super();
                 this.cursor = cursor;
+                this.cursorPhotos = cursorPhotos;
                 inflater = LayoutInflater.from(context);
             }
 
             @Override
-            public Object instantiateItem(ViewGroup container, int position) {
-                LinearLayout layout = (LinearLayout) inflater.inflate(
-                        R.layout.fragment_screen_slide_page, container, false);
+            public Object instantiateItem(ViewGroup container, final int position) {
 
-                if (cursor.moveToPosition(position)) {
+                LinearLayout layout = (LinearLayout) inflater.inflate(
+                        R.layout.fragment_slide_screen_image_page, container, false);
+                layout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        changeInsideFragment(cursor, getAdapterPosition(), positionCursorPhotos);
+                    }
+                });
+
+                if (cursorPhotos.moveToPosition(position)) {
                     String urlMiniature, urlMiniatureFullResolution, urlMiniatureName;
-                    urlMiniature = urlMiniatureFullResolution = urlMiniatureName = cursor.getString(cursor.getColumnIndex(ScriptDatabase.ColumnPhotosBlog.URL));
+                    urlMiniature = urlMiniatureFullResolution = urlMiniatureName = cursorPhotos.getString(cursorPhotos.getColumnIndex(ScriptDatabase.ColumnPhotosBlog.URL));
 
                     if (urlMiniature.contains("localhost"))
-                        urlMiniature = urlMiniature.replace("localhost", "192.168.1.17");
+                        urlMiniature = urlMiniature.replace("localhost", VolleySingleton.WORDPRESS);
 
                     if (urlMiniature.contains("/"))
                         urlMiniatureName = urlMiniature.substring(urlMiniature.lastIndexOf("/"));
@@ -264,8 +315,8 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
 
             @Override
             public int getCount() {
-                if (cursor != null) {
-                    return cursor.getCount();
+                if (cursorPhotos != null) {
+                    return cursorPhotos.getCount();
                 }
                 return 0;
             }
@@ -277,14 +328,20 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
 
             public Cursor swapCursor(Cursor cursor) {
                 Cursor oldCursor = cursor;
-                this.cursor = cursor;
+                this.cursorPhotos = cursor;
                 notifyDataSetChanged();
+                if (cursor == null)
+                    return null;
                 int count = cursor.getCount();
-                if(count != 0)
+                if (count != 0)
                     photo.setText("1 / " + cursor.getCount());
                 else
                     photo.setText("0 / " + cursor.getCount());
                 return oldCursor;
+            }
+
+            public Cursor getCursorPhotos() {
+                return cursorPhotos;
             }
 
         }

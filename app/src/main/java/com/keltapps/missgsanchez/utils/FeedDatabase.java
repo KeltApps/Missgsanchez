@@ -83,14 +83,14 @@ public class FeedDatabase extends SQLiteOpenHelper {
             String title,
             String date,
             String textEs,
-            String textEn) {
+            String url) {
 
         ContentValues values = new ContentValues();
         values.put(ScriptDatabase.ColumnEntries.ID_POST, idPost);
         values.put(ScriptDatabase.ColumnEntries.TITLE, title);
         values.put(ScriptDatabase.ColumnEntries.DATE, date);
-        values.put(ScriptDatabase.ColumnEntries.TEXT_ES, textEs);
-        values.put(ScriptDatabase.ColumnEntries.TEXT_EN, textEn);
+        values.put(ScriptDatabase.ColumnEntries.TEXT, textEs);
+        values.put(ScriptDatabase.ColumnEntries.URL, url);
 
         getWritableDatabase().insert(
                 ScriptDatabase.ENTRY_TABLE_NAME,
@@ -105,14 +105,14 @@ public class FeedDatabase extends SQLiteOpenHelper {
                             String title,
                             String date,
                             String textEs,
-                            String textEn) {
+                            String url) {
 
         ContentValues values = new ContentValues();
         values.put(ScriptDatabase.ColumnEntries.ID_POST, idPost);
         values.put(ScriptDatabase.ColumnEntries.TITLE, title);
         values.put(ScriptDatabase.ColumnEntries.DATE, date);
-        values.put(ScriptDatabase.ColumnEntries.TEXT_ES, textEs);
-        values.put(ScriptDatabase.ColumnEntries.TEXT_EN, textEn);
+        values.put(ScriptDatabase.ColumnEntries.TEXT, textEs);
+        values.put(ScriptDatabase.ColumnEntries.URL, url);
 
         getWritableDatabase().update(
                 ScriptDatabase.ENTRY_TABLE_NAME,
@@ -149,7 +149,7 @@ public class FeedDatabase extends SQLiteOpenHelper {
                             match.getJsonRenderedTitle().getString(),
                             match.getDatePost(),
                             match.getJsonRenderedContent().getString(),
-                            match.getJsonRenderedContent().getString()
+                            match.getUrl()
                     );
 
                 }
@@ -157,13 +157,13 @@ public class FeedDatabase extends SQLiteOpenHelper {
         }
         c.close();
         for (BlogItem article : entryMap.values()) {
-            Log.i(TAG, "insert article");
+            Log.i(TAG, "insert article: " + article.getJsonRenderedContent().getString());
             insertEntry(
                     article.getIdPost(),
                     article.getJsonRenderedTitle().getString(),
                     article.getDatePost(),
                     article.getJsonRenderedContent().getString(),
-                    article.getJsonRenderedContent().getString()
+                    article.getUrl()
             );
             synchronizePhotosBlog(article.getIdPost(), article.getJsonRenderedContent().getString());
         }

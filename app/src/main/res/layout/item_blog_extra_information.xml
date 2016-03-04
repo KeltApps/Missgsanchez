@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/extraInformation_container"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/extraInformation.LinearLayout.height"
@@ -26,7 +27,7 @@
         android:layout_marginRight="@dimen/extraInformation.marginBetween"
         android:layout_marginStart="@dimen/extraInformation.marginIcon"
         android:gravity="center_vertical"
-        tools:text="2 days ago"/>
+        tools:text="2 days ago" />
 
     <ImageView
         android:id="@+id/extraInformation_imageView_photo"
@@ -45,6 +46,6 @@
         android:layout_marginRight="@dimen/extraInformation.marginBetween"
         android:layout_marginStart="@dimen/extraInformation.marginIcon"
         android:gravity="center_vertical"
-        tools:text="2 / 5"/>
+        tools:text="2 / 5" />
 
 </LinearLayout>

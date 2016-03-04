@@ -17,8 +17,8 @@ public class ScriptDatabase {
         public static final String ID_POST = "id_post";
         public static final String TITLE = "title";
         public static final String DATE = "date";
-        public static final String TEXT_ES = "text_es";
-        public static final String TEXT_EN = "text_en";
+        public static final String TEXT = "text";
+        public static final String URL = "url";
     }
 
     public static final String CREATE_ENTRY =
@@ -27,8 +27,8 @@ public class ScriptDatabase {
                     ColumnEntries.ID_POST + " " + INT_TYPE + ","+
                     ColumnEntries.TITLE + " " + STRING_TYPE + " not null," +
                     ColumnEntries.DATE + " " + STRING_TYPE + "," +
-                    ColumnEntries.TEXT_ES + " " + STRING_TYPE + "," +
-                    ColumnEntries.TEXT_EN + " " + STRING_TYPE + ")";
+                    ColumnEntries.TEXT + " " + STRING_TYPE + "," +
+                    ColumnEntries.URL + " " + STRING_TYPE + ")";
 
     public static class ColumnPhotosBlog implements BaseColumns {
         public static final String ID = _ID;

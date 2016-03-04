@@ -26,16 +26,16 @@
                 android:layout_height="match_parent" />
 
             <include
-                layout="@layout/post_item_linear_title"
+                layout="@layout/item_blog_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@id/post_item_pager" />
         </RelativeLayout>
 
         <include
-            layout="@layout/post_item_linear_extra_information"
+            layout="@layout/item_blog_extra_information"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"/>
     </LinearLayout>
 </android.support.v7.widget.CardView>

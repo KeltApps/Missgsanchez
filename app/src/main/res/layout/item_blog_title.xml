@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linear_title_container"
     style="@style/LinearLayout_item_recyclerView"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:showIn="@layout/post_item_blog">
+    tools:showIn="@layout/item_blog">
 
     <TextView
         android:id="@+id/linear_title_textView"

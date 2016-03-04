@@ -15,6 +15,8 @@ public class BlogItem {
     private transient List<String> listPhotos;
     @SerializedName("content")
     private JSONRendered jsonRenderedContent;
+    @SerializedName("link")
+    private String url;
 
 
 
@@ -58,6 +60,13 @@ public class BlogItem {
         this.listPhotos = listPhotos;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
     public class JSONRendered {
         @SerializedName("rendered")

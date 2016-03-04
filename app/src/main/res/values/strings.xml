@@ -5,11 +5,13 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
-
+    <string name="action.share">Share</string>
     <!--Fragments names-->
-    <string name="fragment.postFragment">PostFragment</string>
     <string name="fragment.splashFragment">SplashFragment</string>
-    
+    <string name="fragment.blogPageFragment">BlogPageFragment</string>
+    <string name="fragment.blogInsidePostFragment">BlogInsidePostFragment</string>
+    <string name="fragment.slideFullScreenImagePageFragment">SlideFullScreenImagePageFragment</string>
+
     <string name="loadMore.post">Loading more post...</string>
 
     <!--Time-->
@@ -22,4 +24,5 @@
     <string name="time.minutes">minutes</string>
     <string name="time.second">second</string>
     <string name="time.seconds">seconds</string>
+
 </resources>

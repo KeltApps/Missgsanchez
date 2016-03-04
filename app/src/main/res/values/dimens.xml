@@ -22,4 +22,6 @@
     <dimen name="extraInformation.marginBetween">10dp</dimen>
     <!--Item load more -->
     <dimen name="LoadMore.marginProgress">10dp</dimen>
+    <!--Floating button -->
+    <dimen name="FloatingButton.margin">16dp</dimen>
 </resources>

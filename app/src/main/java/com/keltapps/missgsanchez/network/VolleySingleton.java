@@ -19,7 +19,7 @@ public class VolleySingleton {
     private RequestQueue requestQueue;
     private static Context context;
     private static final String PROTOCOL = "http://";
-    private static final String WORDPRESS = "192.168.1.17";
+    public static final String WORDPRESS = "192.168.1.39";
     private static final String API_NAME = "/wp-json";
     private static final String GET_POST = "/wp/v2/posts";
     public static final int POST_PER_PAGE = 10;

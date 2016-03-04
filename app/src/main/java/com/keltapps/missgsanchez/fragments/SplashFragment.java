@@ -1,6 +1,8 @@
 package com.keltapps.missgsanchez.fragments;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,7 +22,10 @@ public class SplashFragment extends Fragment {
                              Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: " + TAG);
         View rootView = inflater.inflate(R.layout.fragment_splash, container, false);
-
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putBoolean(BlogInsidePostFragment.TAG_ANIM, false);
+        editor.commit();
         return rootView;
     }
 
