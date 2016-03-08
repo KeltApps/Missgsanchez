@@ -6,9 +6,17 @@
 
     <string name="action_settings">Settings</string>
     <string name="action.share">Share</string>
+    
+    <string name="photosSlideCount">%1$d / %2$d</string>
+    <!--Tabs-->
+    <string name="tab.youtube">YouTube</string>
+    <string name="tab.blog">Blog</string>
+    <string name="tab.instagram">Instagram</string>
     <!--Fragments names-->
     <string name="fragment.splashFragment">SplashFragment</string>
-    <string name="fragment.blogPageFragment">BlogPageFragment</string>
+    <string name="fragment.youtubeTabFragment">YouTubeTabFragment</string>
+    <string name="fragment.blogTabFragment">BlogTabFragment</string>
+    <string name="fragment.instagramTabFragment">InstagramTabFragment</string>
     <string name="fragment.blogInsidePostFragment">BlogInsidePostFragment</string>
     <string name="fragment.slideFullScreenImagePageFragment">SlideFullScreenImagePageFragment</string>
 

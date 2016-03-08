@@ -17,16 +17,13 @@ import com.keltapps.missgsanchez.views.adapters.SlideFullScreenImagePagerAdapter
 
 import java.util.List;
 
-/**
- * Created by sergio on 2/03/16 for KelpApps.
- */
+
 public class SlideFullScreenImageActivity extends AppCompatActivity {
     private static final String TAG = SlideFullScreenImageActivity.class.getSimpleName();
     public static String TAG_ARGS_ARRAY_LIST_PHOTOS = "args_array_list_photos";
     public static String TAG_ARGS_ACTUAL_POSITION = "args_actual_position";
     public static String TAG_ARGS_STATUS_BAR_HEIGHT = "args_status_bar_height";
     private String urlImage;
-    private static String FILES_AUTHORITY = "com.missgsanchez.fileprovider";
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -42,13 +39,15 @@ public class SlideFullScreenImageActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.activity_full_screen_toolbar);
         toolbar.setY(statusBarHeight);
         setSupportActionBar(toolbar);
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDefaultDisplayHomeAsUpEnabled(true);
-
+        ActionBar actionBar = getSupportActionBar();
         int actualPosition = intent.getIntExtra(TAG_ARGS_ACTUAL_POSITION, 1);
-        actionBar.setTitle((actualPosition + 1) + " / " + listPhotos.size());
+        final int listPhotosSize = listPhotos.size();
+        if(actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDefaultDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(getString(R.string.photosSlideCount,actualPosition + 1,listPhotosSize));
+        }
 
         ViewPager mPager = (ViewPager) findViewById(R.id.activity_full_screen_view_pager);
         PagerAdapter mPagerAdapter = new SlideFullScreenImagePagerAdapter(getSupportFragmentManager(), listPhotos);
@@ -58,9 +57,9 @@ public class SlideFullScreenImageActivity extends AppCompatActivity {
         mPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(final int position) {
-                String text = actionBar.getTitle().toString();
-                text = text.substring(text.indexOf("/"));
-                actionBar.setTitle((position + 1) + " " + text);
+                ActionBar actionBar = getSupportActionBar();
+                if(actionBar!=null)
+                    actionBar.setTitle(getString(R.string.photosSlideCount,position + 1,listPhotosSize));
                 urlImage = listPhotos.get(position);
             }
         });

@@ -9,9 +9,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 
-/**
- * Created by sergio on 1/01/16 for KelpApps.
- */
+
 public class VolleySingleton {
 
     private static VolleySingleton ourInstance;
@@ -19,7 +17,7 @@ public class VolleySingleton {
     private RequestQueue requestQueue;
     private static Context context;
     private static final String PROTOCOL = "http://";
-    public static final String WORDPRESS = "192.168.1.39";
+    public static final String WORDPRESS = "192.168.1.36";
     private static final String API_NAME = "/wp-json";
     private static final String GET_POST = "/wp/v2/posts";
     public static final int POST_PER_PAGE = 10;

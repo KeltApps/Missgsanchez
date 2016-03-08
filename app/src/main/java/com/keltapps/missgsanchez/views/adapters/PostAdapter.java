@@ -20,7 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.keltapps.missgsanchez.R;
-import com.keltapps.missgsanchez.fragments.BlogPageFragment;
+import com.keltapps.missgsanchez.fragments.BlogTabFragment;
 import com.keltapps.missgsanchez.models.ViewHolderLoad;
 import com.keltapps.missgsanchez.network.LoadImages;
 import com.keltapps.missgsanchez.network.VolleySingleton;
@@ -66,7 +66,6 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-
         switch (viewType) {
             case TYPE_REGULAR:
                 return new ViewHolderPost(context, LayoutInflater.from(viewGroup.getContext())
@@ -82,7 +81,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
 
     @Override
     public int getItemViewType(int position) {
-        if (getCursor() == null || BlogPageFragment.noMorePages)
+        if (getCursor() == null || BlogTabFragment.noMorePages)
             return TYPE_REGULAR;
         return getCursor().getCount() - 1 == position ? TYPE_LOAD : TYPE_REGULAR;
 
@@ -135,7 +134,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
             mPager.setPageTransformer(true, new DepthPageTransformer());
             final Cursor cursorPhotos = mapCursor.get(getAdapterPosition());
             if (cursorPhotos != null)
-                photo.setText("1 / " + cursorPhotos.getCount());
+                photo.setText(context.getString(R.string.photosSlideCount, 1, cursorPhotos.getCount()));
             cursorPagerAdapter = new CursorPagerAdapter(cursor, cursorPhotos);
             mPager.setAdapter(cursorPagerAdapter);
             Integer adapterPosition = mapState.get(getAdapterPosition());
@@ -150,16 +149,15 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
                 @Override
                 public void onPageSelected(final int position) {
                     String text = photo.getText().toString();
-                    text = text.substring(text.indexOf("/"));
-                    photo.setText((position + 1) + " " + text);
+                    text = text.substring(text.lastIndexOf(" ")+1);
+                    photo.setText(context.getString(R.string.photosSlideCount, position + 1, Integer.parseInt(text)));
                     positionCursorPhotos = position;
                 }
             });
             container.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    changeInsideFragment(cursor, getAdapterPosition(), positionCursorPhotos);
+                    changeToInsideFragment(cursor, getAdapterPosition(), positionCursorPhotos);
                 }
             });
         }
@@ -185,12 +183,8 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
                 e.printStackTrace();
                 return " ";
             }
-
-
             //milliseconds
             long different = calendar.getTimeInMillis() - date.getTime();
-
-
             long secondsInMilli = 1000;
             long minutesInMilli = secondsInMilli * 60;
             long hoursInMilli = minutesInMilli * 60;
@@ -243,7 +237,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
         }
 
 
-        private void changeInsideFragment(Cursor cursor, int position, int positionCursorPhotos) {
+        private void changeToInsideFragment(Cursor cursor, int position, int positionCursorPhotos) {
             List<String> listPhotos = new ArrayList<>();
             Cursor cursorPhotos = cursorPagerAdapter.getCursorPhotos();
             int cursorPhotosPosition = cursorPhotos.getPosition();
@@ -255,7 +249,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
             cursorPagerAdapter.getCursorPhotos().moveToPosition(cursorPhotosPosition);
             int cursorPosition = cursor.getPosition();
             cursor.moveToPosition(position);
-            ((BlogPageFragment.OnPostExpandListener) context).onClickPostListener(listPhotos, positionCursorPhotos, time.getText().toString(),
+            ((BlogTabFragment.OnBlogTabListener) context).onClickPostListener(listPhotos, positionCursorPhotos, time.getText().toString(),
                     title.getText().toString(),
                     cursor.getString(cursor.getColumnIndex(ScriptDatabase.ColumnEntries.TEXT)),
                     cursor.getString(cursor.getColumnIndex(ScriptDatabase.ColumnEntries.URL)));
@@ -283,7 +277,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
                 layout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        changeInsideFragment(cursor, getAdapterPosition(), positionCursorPhotos);
+                        changeToInsideFragment(cursor, getAdapterPosition(), positionCursorPhotos);
                     }
                 });
 
@@ -327,7 +321,6 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
             }
 
             public Cursor swapCursor(Cursor cursor) {
-                Cursor oldCursor = cursor;
                 this.cursorPhotos = cursor;
                 notifyDataSetChanged();
                 if (cursor == null)
@@ -337,7 +330,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
                     photo.setText("1 / " + cursor.getCount());
                 else
                     photo.setText("0 / " + cursor.getCount());
-                return oldCursor;
+                return cursor;
             }
 
             public Cursor getCursorPhotos() {

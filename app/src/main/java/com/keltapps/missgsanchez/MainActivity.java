@@ -5,46 +5,40 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.keltapps.missgsanchez.fragments.BlogInsidePostFragment;
-import com.keltapps.missgsanchez.fragments.BlogPageFragment;
+import com.keltapps.missgsanchez.fragments.BlogTabFragment;
 import com.keltapps.missgsanchez.fragments.SplashFragment;
-import com.keltapps.missgsanchez.network.VolleySingleton;
-import com.keltapps.missgsanchez.utils.FeedDatabase;
+import com.keltapps.missgsanchez.views.adapters.MainTabsAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements BlogPageFragment.OnPostExpandListener, NavigationView.OnNavigationItemSelectedListener, BlogInsidePostFragment.OnImageFullScreenListener {
+        implements BlogTabFragment.OnBlogTabListener, NavigationView.OnNavigationItemSelectedListener, BlogInsidePostFragment.OnImageFullScreenListener {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static boolean activityDestroyed = false;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
         NavigationView navigationView = (NavigationView) findViewById(R.id.activity_main_nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
+        setUpTabs();
         if (savedInstanceState == null) {
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -52,48 +46,6 @@ public class MainActivity extends AppCompatActivity
             fragmentTransaction.add(R.id.activity_main_frame_layout, splashFragment, getString(R.string.fragment_splashFragment));
             fragmentTransaction.commit();
         }
-
-        VolleySingleton.getInstance(this).addToRequestQueue(new StringRequest(Request.Method.GET, VolleySingleton.URL_GET_POSTS + 0,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String data) {
-                        int returnSynchronize = FeedDatabase.getInstance(MainActivity.this).synchronizeEntries(data);
-                        if (returnSynchronize == FeedDatabase.RETURN_EMPTY_PAGE)
-                            return;
-                        boolean oldPost = returnSynchronize == FeedDatabase.RETURN_OLD_POST;
-                        if (savedInstanceState == null || activityDestroyed)
-                            changeToPostFragment(oldPost, true);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        // Handle error
-                        Log.v("prueba", "Error volley: " + volleyError);
-                        if (savedInstanceState == null || activityDestroyed)
-                            changeToPostFragment(true, false);
-                    }
-                }
-        ));
-    }
-
-    private void changeToPostFragment(boolean oldPost, boolean connection) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        BlogPageFragment blogPageFragment = new BlogPageFragment();
-        Bundle args = new Bundle();
-        args.putBoolean(BlogPageFragment.TAG_ARGS_OLD_POST, oldPost);
-        args.putBoolean(BlogPageFragment.TAG_ARGS_CONNECTION, connection);
-        blogPageFragment.setArguments(args);
-        fragmentTransaction.replace(R.id.activity_main_frame_layout, blogPageFragment, getString(R.string.fragment_blogPageFragment));
-        try {
-            fragmentTransaction.commitAllowingStateLoss();
-            activityDestroyed = false;
-        } catch (IllegalStateException e) {
-            activityDestroyed = true;
-        }
-
-
     }
 
     @Override
@@ -110,31 +62,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        // int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        //       if (id == R.id.action_settings) {
-        //       return true;
-        //     }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public boolean onSupportNavigateUp() {
-        Log.d(TAG, "onSupportNavigateUp: ");
-        //This method is called when the up button is pressed. Just the pop back stack.
         getSupportFragmentManager().popBackStack();
         return true;
     }
@@ -195,6 +123,30 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onPostLoadedListener() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        SplashFragment splashFragment = (SplashFragment) fragmentManager.findFragmentByTag(getString(R.string.fragment_splashFragment));
+        if (splashFragment == null)
+            return;
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.remove(splashFragment);
+        fragmentTransaction.commitAllowingStateLoss();
+
+    }
+
+    private void setUpTabs() {
+        TabLayout tabs = (TabLayout) findViewById(R.id.activity_main_tab_Layout);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.activity_main_tab_Layout_view_pager);
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabs));
+        PagerAdapter pagerAdapter = new MainTabsAdapter(getSupportFragmentManager(), this);
+        viewPager.setAdapter(pagerAdapter);
+        tabs.setupWithViewPager(viewPager);
+        TabLayout.Tab tab = tabs.getTabAt(MainTabsAdapter.TAB_BLOG);
+        if(tab != null)
+            tab.select();
+    }
+
+    @Override
     public void onClickImageFullScreenListener(List<String> arrayListPhotos, int actualPositionViewPager) {
         Intent intent = new Intent(this, SlideFullScreenImageActivity.class);
         intent.putStringArrayListExtra(SlideFullScreenImageActivity.TAG_ARGS_ARRAY_LIST_PHOTOS, (ArrayList<String>) arrayListPhotos);
@@ -206,8 +158,6 @@ public class MainActivity extends AppCompatActivity
         int statusBarHeight = rectangle.top;
         intent.putExtra(SlideFullScreenImageActivity.TAG_ARGS_STATUS_BAR_HEIGHT, statusBarHeight);
         startActivity(intent);
-
     }
-
 
 }

@@ -12,6 +12,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ShareCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -44,9 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * Created by sergio on 11/02/16 for KelpApps.
- */
+
 public class BlogInsidePostFragment extends Fragment {
     private static final String TAG = BlogInsidePostFragment.class.getSimpleName();
     public static String TAG_ARGS_ARRAY_LIST_PHOTOS = "args_array_list_photos";
@@ -65,7 +64,7 @@ public class BlogInsidePostFragment extends Fragment {
 
         animDrawer(rootView);
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.inside_post_collapsing_toolbar);
-        collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
+        collapsingToolbarLayout.setExpandedTitleColor(ContextCompat.getColor(getContext(), android.R.color.transparent));
         TextView title = (TextView) rootView.findViewById(R.id.linear_title_textView);
         final String sTitle = bundle.getString(TAG_ARGS_TITLE);
         title.setText(sTitle);
@@ -82,13 +81,16 @@ public class BlogInsidePostFragment extends Fragment {
         TextView textTime = (TextView) rootView.findViewById(R.id.extraInformation_textView_time);
         textTime.setText(bundle.getString(TAG_ARGS_TIME_AGO));
         final TextView textPhoto = (TextView) rootView.findViewById(R.id.extraInformation_textView_photo);
-        textPhoto.setText((bundle.getInt(TAG_ARGS_ACTUAL_POSITION) + 1) + " / " + listPhotos.size());
+        final int listPhotosSize;
+        if (listPhotos != null)
+            listPhotosSize = listPhotos.size();
+        else
+            listPhotosSize = 1;
+        textPhoto.setText(getString(R.string.photosSlideCount, bundle.getInt(TAG_ARGS_ACTUAL_POSITION) + 1, listPhotosSize));
         mPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(final int position) {
-                String text = textPhoto.getText().toString();
-                text = text.substring(text.indexOf("/"));
-                textPhoto.setText((position + 1) + " " + text);
+                textPhoto.setText(getString(R.string.photosSlideCount, position + 1, listPhotosSize));
             }
         });
         final String urlPost = bundle.getString(TAG_ARGS_URL_POST);
@@ -99,7 +101,7 @@ public class BlogInsidePostFragment extends Fragment {
                 Intent shareIntent = ShareCompat.IntentBuilder
                         .from(getActivity())
                         .setType("text/plain")
-                        .setText(sTitle+ "\n" + urlPost)
+                        .setText(sTitle + "\n" + urlPost)
                         .getIntent();
                 if (shareIntent.resolveActivity(
                         getActivity().getPackageManager()) != null)
