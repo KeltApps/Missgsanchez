@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.keltapps.missgsanchez.R;
 import com.keltapps.missgsanchez.fragments.BlogTabFragment;
-import com.keltapps.missgsanchez.fragments.InstagramTab;
+import com.keltapps.missgsanchez.fragments.InstagramTabFragment;
 import com.keltapps.missgsanchez.fragments.YouTubeTabFragment;
 
 
@@ -31,7 +31,7 @@ public class MainTabsAdapter extends FragmentPagerAdapter {
             case TAB_BLOG:
                 return new BlogTabFragment();
             case TAB_INSTAGRAM:
-                return new InstagramTab();
+                return new InstagramTabFragment();
             default:
                 return new BlogTabFragment();
         }

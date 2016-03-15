@@ -24,4 +24,6 @@
     <dimen name="LoadMore.marginProgress">10dp</dimen>
     <!--Floating button -->
     <dimen name="FloatingButton.margin">16dp</dimen>
+    <!--Item instagram header-->
+    <dimen name="instagramHeader.height">50dp</dimen>
 </resources>

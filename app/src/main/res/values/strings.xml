@@ -33,4 +33,7 @@
     <string name="time.second">second</string>
     <string name="time.seconds">seconds</string>
 
+    <!--Instagram-->
+    <string name="instagram.likes">%1$d likes</string>
+    <string name="instagram.userLocation">%1$d\n%2$d</string>
 </resources>

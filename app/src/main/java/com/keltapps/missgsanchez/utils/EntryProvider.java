@@ -14,10 +14,10 @@ import android.support.annotation.Nullable;
 public class EntryProvider extends ContentProvider {
     private static final String prefix_content = "content://";
     private static final String prefix_uri = "com.keltapps.missgsanchez.contentproviders";
-    private static final String uri = prefix_content + prefix_uri + "/" + ScriptDatabase.ENTRY_TABLE_NAME;
+    private static final String uri = prefix_content + prefix_uri + "/" + ScriptDatabase.BLOG_TABLE_NAME;
     private static final String uri_photos = prefix_content + prefix_uri + "/" + ScriptDatabase.PHOTOS_BLOG_TABLE_NAME;
     private static final String suffix_uri_limit = "/limit";
-    private static final String uri_limit = prefix_content + prefix_uri + "/" + ScriptDatabase.ENTRY_TABLE_NAME + suffix_uri_limit;
+    private static final String uri_limit = prefix_content + prefix_uri + "/" + ScriptDatabase.BLOG_TABLE_NAME + suffix_uri_limit;
     public static final Uri CONTENT_URI = Uri.parse(uri);
     public static final Uri CONTENT_URI_LIMIT = Uri.parse(uri_limit);
     public static final Uri CONTENT_URI_PHOTOS = Uri.parse(uri_photos);
@@ -37,9 +37,9 @@ public class EntryProvider extends ContentProvider {
     //Initialize UriMatcher
     static {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(prefix_uri, ScriptDatabase.ENTRY_TABLE_NAME, ENTRIES);
-        uriMatcher.addURI(prefix_uri, ScriptDatabase.ENTRY_TABLE_NAME + "/#", ENTRIES_ID);
-        uriMatcher.addURI(prefix_uri, ScriptDatabase.ENTRY_TABLE_NAME + suffix_uri_limit + "/#", ENTRIES_LIMIT);
+        uriMatcher.addURI(prefix_uri, ScriptDatabase.BLOG_TABLE_NAME, ENTRIES);
+        uriMatcher.addURI(prefix_uri, ScriptDatabase.BLOG_TABLE_NAME + "/#", ENTRIES_ID);
+        uriMatcher.addURI(prefix_uri, ScriptDatabase.BLOG_TABLE_NAME + suffix_uri_limit + "/#", ENTRIES_LIMIT);
         uriMatcher.addURI(prefix_uri, ScriptDatabase.PHOTOS_BLOG_TABLE_NAME, PHOTOS);
     }
 
@@ -56,14 +56,14 @@ public class EntryProvider extends ContentProvider {
         String where = selection;
         switch (uriMatcher.match(uri)) {
             case ENTRIES:
-                return feedDatabase.getWritableDatabase().query(ScriptDatabase.ENTRY_TABLE_NAME, projection, where,
+                return feedDatabase.getWritableDatabase().query(ScriptDatabase.BLOG_TABLE_NAME, projection, where,
                         selectionArgs, null, null, sortOrder);
             case ENTRIES_ID:
                 where = "_id=" + uri.getLastPathSegment();
-                return feedDatabase.getWritableDatabase().query(ScriptDatabase.ENTRY_TABLE_NAME, projection, where,
+                return feedDatabase.getWritableDatabase().query(ScriptDatabase.BLOG_TABLE_NAME, projection, where,
                         selectionArgs, null, null, sortOrder);
             case ENTRIES_LIMIT:
-                return feedDatabase.getWritableDatabase().query(ScriptDatabase.ENTRY_TABLE_NAME, projection, where,
+                return feedDatabase.getWritableDatabase().query(ScriptDatabase.BLOG_TABLE_NAME, projection, where,
                         selectionArgs, null, null, sortOrder, uri.getLastPathSegment());
             case PHOTOS:
                 return feedDatabase.getWritableDatabase().query(ScriptDatabase.PHOTOS_BLOG_TABLE_NAME, projection, where,
@@ -98,7 +98,7 @@ public class EntryProvider extends ContentProvider {
             case ENTRIES:
             case ENTRIES_ID:
             case ENTRIES_LIMIT:
-                regId = feedDatabase.getWritableDatabase().insert(ScriptDatabase.ENTRY_TABLE_NAME, null, values);
+                regId = feedDatabase.getWritableDatabase().insert(ScriptDatabase.BLOG_TABLE_NAME, null, values);
                 break;
             case PHOTOS:
                 regId = feedDatabase.getWritableDatabase().insert(ScriptDatabase.PHOTOS_BLOG_TABLE_NAME, null, values);
@@ -114,12 +114,12 @@ public class EntryProvider extends ContentProvider {
         String where = selection;
         switch (uriMatcher.match(uri)) {
             case ENTRIES:
-                return feedDatabase.getWritableDatabase().delete(ScriptDatabase.ENTRY_TABLE_NAME, where, selectionArgs);
+                return feedDatabase.getWritableDatabase().delete(ScriptDatabase.BLOG_TABLE_NAME, where, selectionArgs);
             case ENTRIES_ID:
                 where = "_id=" + uri.getLastPathSegment();
-                return feedDatabase.getWritableDatabase().delete(ScriptDatabase.ENTRY_TABLE_NAME, where, selectionArgs);
+                return feedDatabase.getWritableDatabase().delete(ScriptDatabase.BLOG_TABLE_NAME, where, selectionArgs);
             case ENTRIES_LIMIT:
-                return feedDatabase.getWritableDatabase().delete(ScriptDatabase.ENTRY_TABLE_NAME, where, selectionArgs);
+                return feedDatabase.getWritableDatabase().delete(ScriptDatabase.BLOG_TABLE_NAME, where, selectionArgs);
             case PHOTOS:
                 return feedDatabase.getWritableDatabase().delete(ScriptDatabase.PHOTOS_BLOG_TABLE_NAME, where, selectionArgs);
             default:
@@ -132,12 +132,12 @@ public class EntryProvider extends ContentProvider {
         String where = selection;
         switch (uriMatcher.match(uri)) {
             case ENTRIES:
-                return feedDatabase.getWritableDatabase().update(ScriptDatabase.ENTRY_TABLE_NAME, values, where, selectionArgs);
+                return feedDatabase.getWritableDatabase().update(ScriptDatabase.BLOG_TABLE_NAME, values, where, selectionArgs);
             case ENTRIES_ID:
                 where = "_id=" + uri.getLastPathSegment();
-                return feedDatabase.getWritableDatabase().update(ScriptDatabase.ENTRY_TABLE_NAME, values, where, selectionArgs);
+                return feedDatabase.getWritableDatabase().update(ScriptDatabase.BLOG_TABLE_NAME, values, where, selectionArgs);
             case ENTRIES_LIMIT:
-                return feedDatabase.getWritableDatabase().update(ScriptDatabase.ENTRY_TABLE_NAME, values, where, selectionArgs);
+                return feedDatabase.getWritableDatabase().update(ScriptDatabase.BLOG_TABLE_NAME, values, where, selectionArgs);
             case PHOTOS:
                 return feedDatabase.getWritableDatabase().update(ScriptDatabase.PHOTOS_BLOG_TABLE_NAME, values, where, selectionArgs);
             default:

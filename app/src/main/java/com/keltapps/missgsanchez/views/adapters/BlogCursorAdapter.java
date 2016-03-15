@@ -37,14 +37,14 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHolder> {
+public class BlogCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHolder> {
     private static final int TYPE_REGULAR = 0;
     private static final int TYPE_LOAD = 1;
     private Context context;
     private HashMap<Integer, Integer> mapState = new HashMap<>();
     private HashMap<Integer, Cursor> mapCursor = new HashMap<>();
 
-    public PostAdapter(Context context, Cursor cursor) {
+    public BlogCursorAdapter(Context context, Cursor cursor) {
         super(context, cursor);
         this.context = context;
     }
@@ -53,13 +53,13 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, Cursor cursor) {
         switch (getItemViewType(cursor.getPosition())) {
             case TYPE_REGULAR:
-                ((ViewHolderPost) viewHolder).bindProfile(context, cursor, mapState);
+                ((ViewHolderPost) viewHolder).bindHolder(context, cursor, mapState);
                 break;
             case TYPE_LOAD:
                 ((ViewHolderLoad) viewHolder).bindProfile();
                 break;
             default:
-                ((ViewHolderPost) viewHolder).bindProfile(context, cursor, mapState);
+                ((ViewHolderPost) viewHolder).bindHolder(context, cursor, mapState);
                 break;
         }
     }
@@ -128,9 +128,9 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
             includeExtraPhotoImage = itemView.findViewById(R.id.extraInformation_imageView_photo);
         }
 
-        public void bindProfile(final Context context, final Cursor cursor, HashMap<Integer, Integer> mapState) {
-            title.setText(cursor.getString(cursor.getColumnIndex(ScriptDatabase.ColumnEntries.TITLE)));
-            time.setText(getDifferenceTime(context, cursor.getString(cursor.getColumnIndex(ScriptDatabase.ColumnEntries.DATE))));
+        public void bindHolder(final Context context, final Cursor cursor, HashMap<Integer, Integer> mapState) {
+            title.setText(cursor.getString(cursor.getColumnIndex(ScriptDatabase.ColumnBlog.TITLE)));
+            time.setText(getDifferenceTime(context, cursor.getString(cursor.getColumnIndex(ScriptDatabase.ColumnBlog.DATE))));
             mPager.setPageTransformer(true, new DepthPageTransformer());
             final Cursor cursorPhotos = mapCursor.get(getAdapterPosition());
             if (cursorPhotos != null)
@@ -142,7 +142,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
                 mPager.setCurrentItem(adapterPosition);
             else {
                 Bundle bundle = new Bundle();
-                bundle.putInt(TAG_ID_POST, cursor.getInt(cursor.getColumnIndex(ScriptDatabase.ColumnEntries.ID_POST)));
+                bundle.putInt(TAG_ID_POST, cursor.getInt(cursor.getColumnIndex(ScriptDatabase.ColumnBlog.ID_POST)));
                 ((AppCompatActivity) context).getLoaderManager().initLoader(getAdapterPosition(), bundle, this);
             }
             mPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -251,8 +251,8 @@ public class PostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHold
             cursor.moveToPosition(position);
             ((BlogTabFragment.OnBlogTabListener) context).onClickPostListener(listPhotos, positionCursorPhotos, time.getText().toString(),
                     title.getText().toString(),
-                    cursor.getString(cursor.getColumnIndex(ScriptDatabase.ColumnEntries.TEXT)),
-                    cursor.getString(cursor.getColumnIndex(ScriptDatabase.ColumnEntries.URL)));
+                    cursor.getString(cursor.getColumnIndex(ScriptDatabase.ColumnBlog.TEXT)),
+                    cursor.getString(cursor.getColumnIndex(ScriptDatabase.ColumnBlog.URL)));
             cursor.moveToPosition(cursorPosition);
         }
 

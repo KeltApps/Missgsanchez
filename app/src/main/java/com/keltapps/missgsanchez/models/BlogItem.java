@@ -19,7 +19,6 @@ public class BlogItem {
     private String url;
 
 
-
     public int getIdPost() {
         return idPost;
     }

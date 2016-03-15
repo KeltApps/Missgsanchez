@@ -10,6 +10,7 @@ import android.util.Log;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.keltapps.missgsanchez.models.BlogItem;
+import com.keltapps.missgsanchez.models.InstagramItem;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -54,14 +55,16 @@ public class FeedDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(ScriptDatabase.CREATE_ENTRY);
+        db.execSQL(ScriptDatabase.CREATE_BLOG);
         db.execSQL(ScriptDatabase.CREATE_PHOTOS_BLOG);
+        db.execSQL(ScriptDatabase.CREATE_INSTAGRAM);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + ScriptDatabase.ENTRY_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ScriptDatabase.BLOG_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ScriptDatabase.PHOTOS_BLOG_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ScriptDatabase.INSTAGRAM_TABLE_NAME);
         onCreate(db);
     }
 
@@ -72,7 +75,7 @@ public class FeedDatabase extends SQLiteOpenHelper {
      */
     public Cursor getEntries() {
         return getWritableDatabase().rawQuery(
-                "select * from " + ScriptDatabase.ENTRY_TABLE_NAME, null);
+                "select * from " + ScriptDatabase.BLOG_TABLE_NAME, null);
     }
 
     /**
@@ -86,14 +89,14 @@ public class FeedDatabase extends SQLiteOpenHelper {
             String url) {
 
         ContentValues values = new ContentValues();
-        values.put(ScriptDatabase.ColumnEntries.ID_POST, idPost);
-        values.put(ScriptDatabase.ColumnEntries.TITLE, title);
-        values.put(ScriptDatabase.ColumnEntries.DATE, date);
-        values.put(ScriptDatabase.ColumnEntries.TEXT, textEs);
-        values.put(ScriptDatabase.ColumnEntries.URL, url);
+        values.put(ScriptDatabase.ColumnBlog.ID_POST, idPost);
+        values.put(ScriptDatabase.ColumnBlog.TITLE, title);
+        values.put(ScriptDatabase.ColumnBlog.DATE, date);
+        values.put(ScriptDatabase.ColumnBlog.TEXT, textEs);
+        values.put(ScriptDatabase.ColumnBlog.URL, url);
 
         getWritableDatabase().insert(
-                ScriptDatabase.ENTRY_TABLE_NAME,
+                ScriptDatabase.BLOG_TABLE_NAME,
                 null,
                 values
         );
@@ -108,23 +111,23 @@ public class FeedDatabase extends SQLiteOpenHelper {
                             String url) {
 
         ContentValues values = new ContentValues();
-        values.put(ScriptDatabase.ColumnEntries.ID_POST, idPost);
-        values.put(ScriptDatabase.ColumnEntries.TITLE, title);
-        values.put(ScriptDatabase.ColumnEntries.DATE, date);
-        values.put(ScriptDatabase.ColumnEntries.TEXT, textEs);
-        values.put(ScriptDatabase.ColumnEntries.URL, url);
+        values.put(ScriptDatabase.ColumnBlog.ID_POST, idPost);
+        values.put(ScriptDatabase.ColumnBlog.TITLE, title);
+        values.put(ScriptDatabase.ColumnBlog.DATE, date);
+        values.put(ScriptDatabase.ColumnBlog.TEXT, textEs);
+        values.put(ScriptDatabase.ColumnBlog.URL, url);
 
         getWritableDatabase().update(
-                ScriptDatabase.ENTRY_TABLE_NAME,
+                ScriptDatabase.BLOG_TABLE_NAME,
                 values,
-                ScriptDatabase.ColumnEntries.ID + "=?",
+                ScriptDatabase.ColumnBlog.ID + "=?",
                 new String[]{String.valueOf(id)});
 
     }
 
 
     public int synchronizeEntries(String data) {
-        if(data.equals(TAG_EMPTY_PAGE))
+        if (data.equals(TAG_EMPTY_PAGE))
             return RETURN_EMPTY_PAGE;
         Type fooType = new TypeToken<ArrayList<BlogItem>>() {
         }.getType();
@@ -137,14 +140,14 @@ public class FeedDatabase extends SQLiteOpenHelper {
         assert c != null;
         Boolean oldPost = false;
         while (c.moveToNext()) {
-            int postId = c.getInt(c.getColumnIndex(ScriptDatabase.ColumnEntries.ID_POST));
+            int postId = c.getInt(c.getColumnIndex(ScriptDatabase.ColumnBlog.ID_POST));
             BlogItem match = entryMap.get(postId);
             if (match != null) {
                 entryMap.remove(postId);
                 oldPost = true;
                 if (match.getIdPost() != postId) {
                     updateEntry(
-                            c.getInt(c.getColumnIndex(ScriptDatabase.ColumnEntries.ID)),
+                            c.getInt(c.getColumnIndex(ScriptDatabase.ColumnBlog.ID)),
                             match.getIdPost(),
                             match.getJsonRenderedTitle().getString(),
                             match.getDatePost(),
@@ -219,5 +222,105 @@ public class FeedDatabase extends SQLiteOpenHelper {
         for (String urlPhoto : listPhotos)
             insertPhotoBlog(idPost, urlPhoto);
     }
+
+
+    public void insertInstagram(int idPost, String urlProfilePhoto, String user, String location,
+                                int time, String urlPhoto, int likes, String title) {
+
+        ContentValues values = new ContentValues();
+        values.put(ScriptDatabase.ColumnInstagram.ID_POST, idPost);
+        values.put(ScriptDatabase.ColumnInstagram.URL_PROFILE_PHOTO, urlProfilePhoto);
+        values.put(ScriptDatabase.ColumnInstagram.USER, user);
+        values.put(ScriptDatabase.ColumnInstagram.LOCATION, location);
+        values.put(ScriptDatabase.ColumnInstagram.TIME, time);
+        values.put(ScriptDatabase.ColumnInstagram.URL_PHOTO, urlPhoto);
+        values.put(ScriptDatabase.ColumnInstagram.LIKES, likes);
+        values.put(ScriptDatabase.ColumnInstagram.TITLE, title);
+
+        getWritableDatabase().insert(
+                ScriptDatabase.INSTAGRAM_TABLE_NAME,
+                null,
+                values
+        );
+    }
+
+    public void updateInstagram(int id, int idPost, String urlProfilePhoto, String user, String location,
+                                int time, String urlPhoto, int likes, String title) {
+
+        ContentValues values = new ContentValues();
+        values.put(ScriptDatabase.ColumnInstagram.ID_POST, idPost);
+        values.put(ScriptDatabase.ColumnInstagram.URL_PROFILE_PHOTO, urlProfilePhoto);
+        values.put(ScriptDatabase.ColumnInstagram.USER, user);
+        values.put(ScriptDatabase.ColumnInstagram.LOCATION, location);
+        values.put(ScriptDatabase.ColumnInstagram.TIME, time);
+        values.put(ScriptDatabase.ColumnInstagram.URL_PHOTO, urlPhoto);
+        values.put(ScriptDatabase.ColumnInstagram.LIKES, likes);
+        values.put(ScriptDatabase.ColumnInstagram.TITLE, title);
+
+        getWritableDatabase().update(
+                ScriptDatabase.INSTAGRAM_TABLE_NAME,
+                values,
+                ScriptDatabase.ColumnBlog.ID + "=?",
+                new String[]{String.valueOf(id)});
+
+    }
+
+
+    public Cursor getInstagram(int idPost) {
+        return getWritableDatabase().rawQuery(
+                "select * from " + ScriptDatabase.INSTAGRAM_TABLE_NAME + " where " + ScriptDatabase.ColumnInstagram.ID_POST + " = " + idPost, null);
+    }
+
+    public void synchronizeInstagram(String data) {
+
+        Type fooType = new TypeToken<InstagramItem>() {
+        }.getType();
+        InstagramItem instagramItem = new GsonBuilder().create().fromJson(data, fooType);
+
+        HashMap<String, InstagramItem.InstagramSubItem> entryMap = new HashMap<>();
+        List<InstagramItem.InstagramSubItem> instagramSubItems = instagramItem.getListSubItem();
+        for (InstagramItem.InstagramSubItem instagramSubItem : instagramSubItems) {
+            entryMap.put(instagramSubItem.getId(), instagramSubItem);
+            Log.d(TAG, "synchronizeInstagram: " + instagramSubItem.getInstagramImages().getStandard_resolution().getUrl());
+        }
+        Cursor c = getEntries();
+        assert c != null;
+        Boolean oldPost = false;
+
+     /*   while (c.moveToNext()) {
+            int postId = c.getInt(c.getColumnIndex(ScriptDatabase.ColumnInstagram.ID_POST));
+            InstagramItem.InstagramSubItem match = entryMap.get(postId);
+            if (match != null) {
+                entryMap.remove(postId);
+                oldPost = true;
+                if (match.getId() != postId) {
+                    updateEntry(
+                            c.getInt(c.getColumnIndex(ScriptDatabase.ColumnBlog.ID)),
+                            match.getId(),
+                            match.getInstagramImages()getJsonRenderedTitle().getString(),
+                            match.getDatePost(),
+                            match.getJsonRenderedContent().getString(),
+                            match.getUrl()
+                    );
+
+                }
+            }
+        }
+        c.close();
+        for (BlogItem article : entryMap.values()) {
+            Log.i(TAG, "insert article: " + article.getJsonRenderedContent().getString());
+            insertEntry(
+                    article.getIdPost(),
+                    article.getJsonRenderedTitle().getString(),
+                    article.getDatePost(),
+                    article.getJsonRenderedContent().getString(),
+                    article.getUrl()
+            );
+            synchronizePhotosBlog(article.getIdPost(), article.getJsonRenderedContent().getString());
+        }
+
+        return oldPost ? RETURN_OLD_POST : RETURN_NO_OLD_POST;*/
+    }
+
 
 }

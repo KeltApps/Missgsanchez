@@ -26,15 +26,15 @@ import com.keltapps.missgsanchez.network.VolleySingleton;
 import com.keltapps.missgsanchez.utils.EntryProvider;
 import com.keltapps.missgsanchez.utils.FeedDatabase;
 import com.keltapps.missgsanchez.utils.ScriptDatabase;
-import com.keltapps.missgsanchez.views.adapters.PostAdapter;
+import com.keltapps.missgsanchez.views.adapters.BlogCursorAdapter;
 
 import java.util.List;
 
 
 public class BlogTabFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, Response.Listener<String>, Response.ErrorListener {
-    private static final String TAG = PostAdapter.class.getSimpleName();
+    private static final String TAG = BlogCursorAdapter.class.getSimpleName();
     private static final String TAG_LIMIT_QUERY = "limit_query";
-    PostAdapter postAdapter;
+    BlogCursorAdapter blogCursorAdapter;
     boolean loading = true;
     public static boolean noMorePages = false;
     private int totalItemCount;
@@ -45,13 +45,13 @@ public class BlogTabFragment extends Fragment implements LoaderManager.LoaderCal
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_post, container, false);
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_post_recyclerView);
-        postAdapter = new PostAdapter(getActivity(), null);
-        recyclerView.setAdapter(postAdapter);
+        blogCursorAdapter = new BlogCursorAdapter(getActivity(), null);
+        recyclerView.setAdapter(blogCursorAdapter);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayout.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         VolleySingleton.getInstance(getActivity()).addToRequestQueue(new StringRequest(Request.Method.GET,
-                VolleySingleton.URL_GET_POSTS + 0,
+                VolleySingleton.URL_GET_BLOG + 0,
                 BlogTabFragment.this, BlogTabFragment.this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -69,7 +69,7 @@ public class BlogTabFragment extends Fragment implements LoaderManager.LoaderCal
                             loading = false;
                             int numberPage = (int) Math.ceil((totalItemCount - 1) * 1.0 / VolleySingleton.POST_PER_PAGE) + 1;
                             VolleySingleton.getInstance(getActivity()).addToRequestQueue(new StringRequest(Request.Method.GET,
-                                    VolleySingleton.URL_GET_POSTS + numberPage,
+                                    VolleySingleton.URL_GET_BLOG + numberPage,
                                     BlogTabFragment.this, BlogTabFragment.this));
                         }
                     }
@@ -82,7 +82,7 @@ public class BlogTabFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        postAdapter = null;
+        blogCursorAdapter = null;
     }
 
     private void sqlQuery(boolean oldPost, int totalItemCount) {
@@ -101,29 +101,29 @@ public class BlogTabFragment extends Fragment implements LoaderManager.LoaderCal
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (id == 0)
             return new CursorLoader(getActivity(), EntryProvider.CONTENT_URI, null, null, null,
-                    ScriptDatabase.ColumnEntries.DATE + " DESC");
+                    ScriptDatabase.ColumnBlog.DATE + " DESC");
         else
             return new CursorLoader(getActivity(), Uri.parse(EntryProvider.CONTENT_URI_LIMIT + "/" + args.get(TAG_LIMIT_QUERY)),
-                    null, null, null, ScriptDatabase.ColumnEntries.DATE + " DESC");
+                    null, null, null, ScriptDatabase.ColumnBlog.DATE + " DESC");
     }
 
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
         if (!noMorePages) {   //Add the "load more" element
-            MatrixCursor matrixCursor = new MatrixCursor(new String[]{ScriptDatabase.ColumnEntries.ID});
+            MatrixCursor matrixCursor = new MatrixCursor(new String[]{ScriptDatabase.ColumnBlog.ID});
             matrixCursor.addRow(new String[]{"-1"});
             Cursor[] cursors = {data, matrixCursor};
             Cursor extendedCursor = new MergeCursor(cursors);
-            postAdapter.swapCursor(extendedCursor);
+            blogCursorAdapter.swapCursor(extendedCursor);
             loading = true;
         } else
-            postAdapter.swapCursor(data);
+            blogCursorAdapter.swapCursor(data);
     }
 
     @Override
     public void onLoaderReset(android.support.v4.content.Loader<Cursor> loader) {
-        if (postAdapter != null)
-            postAdapter.changeCursor(null);
+        if (blogCursorAdapter != null)
+            blogCursorAdapter.changeCursor(null);
     }
 
     @Override
