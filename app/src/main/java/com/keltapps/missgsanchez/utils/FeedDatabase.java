@@ -224,7 +224,7 @@ public class FeedDatabase extends SQLiteOpenHelper {
     }
 
 
-    public void insertInstagram(int idPost, String urlProfilePhoto, String user, String location,
+    public void insertInstagram(String idPost, String urlProfilePhoto, String user, String location,
                                 int time, String urlPhoto, int likes, String title) {
 
         ContentValues values = new ContentValues();
@@ -244,7 +244,7 @@ public class FeedDatabase extends SQLiteOpenHelper {
         );
     }
 
-    public void updateInstagram(int id, int idPost, String urlProfilePhoto, String user, String location,
+    public void updateInstagram(int id, String idPost, String urlProfilePhoto, String user, String location,
                                 int time, String urlPhoto, int likes, String title) {
 
         ContentValues values = new ContentValues();
@@ -271,7 +271,7 @@ public class FeedDatabase extends SQLiteOpenHelper {
                 "select * from " + ScriptDatabase.INSTAGRAM_TABLE_NAME + " where " + ScriptDatabase.ColumnInstagram.ID_POST + " = " + idPost, null);
     }
 
-    public void synchronizeInstagram(String data) {
+    public int synchronizeInstagram(String data) {
 
         Type fooType = new TypeToken<InstagramItem>() {
         }.getType();
@@ -279,47 +279,46 @@ public class FeedDatabase extends SQLiteOpenHelper {
 
         HashMap<String, InstagramItem.InstagramSubItem> entryMap = new HashMap<>();
         List<InstagramItem.InstagramSubItem> instagramSubItems = instagramItem.getListSubItem();
-        for (InstagramItem.InstagramSubItem instagramSubItem : instagramSubItems) {
+        for (InstagramItem.InstagramSubItem instagramSubItem : instagramSubItems) 
             entryMap.put(instagramSubItem.getId(), instagramSubItem);
-            Log.d(TAG, "synchronizeInstagram: " + instagramSubItem.getInstagramImages().getStandard_resolution().getUrl());
-        }
         Cursor c = getEntries();
         assert c != null;
         Boolean oldPost = false;
 
-     /*   while (c.moveToNext()) {
-            int postId = c.getInt(c.getColumnIndex(ScriptDatabase.ColumnInstagram.ID_POST));
+       while (c.moveToNext()) {
+            String postId = c.getString((c.getColumnIndex(ScriptDatabase.ColumnInstagram.ID_POST));
             InstagramItem.InstagramSubItem match = entryMap.get(postId);
             if (match != null) {
                 entryMap.remove(postId);
                 oldPost = true;
                 if (match.getId() != postId) {
-                    updateEntry(
-                            c.getInt(c.getColumnIndex(ScriptDatabase.ColumnBlog.ID)),
+                    updateInstagram(
+                            c.getInt(c.getColumnIndex(ScriptDatabase.ColumnInstagram.ID_POST)),
                             match.getId(),
-                            match.getInstagramImages()getJsonRenderedTitle().getString(),
-                            match.getDatePost(),
-                            match.getJsonRenderedContent().getString(),
-                            match.getUrl()
+							match.getInstagramUser().getProfilePicture(),
+							match.getInstagramUser().getUserName(),
+				       	   match.getInstagramImages().getLowResolution().getUrl(),
+                            match.getInstagramLikes().getCount(),
+                            match.title
                     );
 
                 }
             }
         }
         c.close();
-        for (BlogItem article : entryMap.values()) {
-            Log.i(TAG, "insert article: " + article.getJsonRenderedContent().getString());
+        for (InstagramItem.InstagramSubItem article : entryMap.values()) {
+            Log.i(TAG, "insert instagram: " );
             insertEntry(
-                    article.getIdPost(),
-                    article.getJsonRenderedTitle().getString(),
-                    article.getDatePost(),
-                    article.getJsonRenderedContent().getString(),
-                    article.getUrl()
+                    article.getId(),
+				article.getInstagramUser().getProfilePicture(),
+				article.getInstagramUser().getUserName(),
+				article.getInstagramImages().getLowResolution().getUrl(),
+				article.getInstagramLikes().getCount(),
+				article.title
             );
-            synchronizePhotosBlog(article.getIdPost(), article.getJsonRenderedContent().getString());
         }
 
-        return oldPost ? RETURN_OLD_POST : RETURN_NO_OLD_POST;*/
+        return oldPost ? RETURN_OLD_POST : RETURN_NO_OLD_POST;
     }
 
 

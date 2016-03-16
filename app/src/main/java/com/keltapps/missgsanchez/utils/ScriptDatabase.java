@@ -58,7 +58,7 @@ public class ScriptDatabase {
     public static final String CREATE_INSTAGRAM =
             "CREATE TABLE " + INSTAGRAM_TABLE_NAME + "(" +
                     ColumnInstagram.ID + " " + INT_TYPE + " primary key autoincrement," +
-                    ColumnInstagram.ID_POST + " " + INT_TYPE + "," +
+                    ColumnInstagram.ID_POST + " " + STRING_TYPE + "," +
                     ColumnInstagram.URL_PROFILE_PHOTO + " " + STRING_TYPE + "," +
                     ColumnInstagram.USER + " " + STRING_TYPE + "," +
                     ColumnInstagram.LOCATION + " " + STRING_TYPE + "," +

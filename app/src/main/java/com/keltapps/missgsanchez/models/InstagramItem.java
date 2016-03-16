@@ -142,14 +142,46 @@ public class InstagramItem {
     public class InstagramLikes {
         @SerializedName("count")
         int count;
-    }
+
+
+		public void setCount(int count)
+		{
+			this.count = count;
+		}
+
+		public int getCount()
+		{
+			return count;
+		}}
 
     public class InstagramUser {
         @SerializedName("username")
         String userName;
         @SerializedName("profile_picture")
         String profilePicture;
-    }
+
+		public void setUserName(String userName)
+		{
+			this.userName = userName;
+		}
+
+		public String getUserName()
+		{
+			return userName;
+		}
+		
+
+
+		public void setProfilePicture(String profilePicture)
+		{
+			this.profilePicture = profilePicture;
+		}
+
+		public String getProfilePicture()
+		{
+			return profilePicture;
+		}
+		}
 
     public String getStatus() {
         return status;
