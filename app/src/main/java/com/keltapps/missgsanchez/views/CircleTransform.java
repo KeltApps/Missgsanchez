@@ -3,7 +3,9 @@ package com.keltapps.missgsanchez.views;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+
 import com.squareup.picasso.Transformation;
 
 
@@ -33,6 +35,18 @@ public class CircleTransform implements Transformation {
         canvas.drawCircle(r, r, r, paint);
 
         squaredBitmap.recycle();
+
+
+
+        Paint paint2 = new Paint();
+        paint2.setColor(Color.BLACK);
+        paint2.setStyle(Paint.Style.STROKE);
+        paint2.setAntiAlias(true);
+        paint2.setStrokeWidth(2);
+        canvas.drawCircle(source.getWidth() / 2, source.getHeight() / 2, r - 1, paint2);
+
+
+
         return bitmap;
     }
 

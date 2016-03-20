@@ -12,11 +12,11 @@ import com.keltapps.missgsanchez.fragments.YouTubeTabFragment;
 
 
 public class MainTabsAdapter extends FragmentPagerAdapter {
-    private static int NUMBER_TABS = 3;
+    private static final int NUMBER_TABS = 3;
     public static final int TAB_YOUTUBE = 0;
     public static final int TAB_BLOG = 1;
     public static final int TAB_INSTAGRAM = 2;
-    private Context context;
+    private final Context context;
 
     public MainTabsAdapter(FragmentManager fm, Context context) {
         super(fm);

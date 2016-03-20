@@ -20,7 +20,7 @@
     <string name="fragment.blogInsidePostFragment">BlogInsidePostFragment</string>
     <string name="fragment.slideFullScreenImagePageFragment">SlideFullScreenImagePageFragment</string>
 
-    <string name="loadMore.post">Loading more post...</string>
+    <string name="loadMore.post">Loading more post&#8230;</string>
 
     <!--Time-->
     <string name="time.ago">ago</string>
@@ -35,5 +35,5 @@
 
     <!--Instagram-->
     <string name="instagram.likes">%1$d likes</string>
-    <string name="instagram.userLocation">%1$d\n%2$d</string>
+    <string name="instagram.userLocation">%1$s\n%2$s</string>
 </resources>

@@ -40,12 +40,12 @@ import java.util.List;
 public class BlogCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHolder> {
     private static final int TYPE_REGULAR = 0;
     private static final int TYPE_LOAD = 1;
-    private Context context;
-    private HashMap<Integer, Integer> mapState = new HashMap<>();
-    private HashMap<Integer, Cursor> mapCursor = new HashMap<>();
+    private final Context context;
+    private final HashMap<Integer, Integer> mapState = new HashMap<>();
+    private final HashMap<Integer, Cursor> mapCursor = new HashMap<>();
 
-    public BlogCursorAdapter(Context context, Cursor cursor) {
-        super(context, cursor);
+    public BlogCursorAdapter(Context context) {
+        super(null);
         this.context = context;
     }
 
@@ -56,7 +56,7 @@ public class BlogCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView.Vi
                 ((ViewHolderPost) viewHolder).bindHolder(context, cursor, mapState);
                 break;
             case TYPE_LOAD:
-                ((ViewHolderLoad) viewHolder).bindProfile();
+              //  ((ViewHolderLoad) viewHolder).bindProfile();
                 break;
             default:
                 ((ViewHolderPost) viewHolder).bindHolder(context, cursor, mapState);
@@ -94,21 +94,21 @@ public class BlogCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView.Vi
     }
 
     public static class ViewHolderPost extends RecyclerView.ViewHolder implements LoaderManager.LoaderCallbacks<Cursor> {
-        private static String TAG_ID_POST = "id_post";
+        private static final String TAG_ID_POST = "id_post";
         private static String TAG = ViewHolderPost.class.getSimpleName();
-        Context context;
-        View container;
-        TextView title;
-        TextView time;
-        TextView photo;
-        Calendar calendar;
-        public ViewPager mPager;
+        final Context context;
+        final View container;
+        final TextView title;
+        final TextView time;
+        final TextView photo;
+        final Calendar calendar;
+        public final ViewPager mPager;
         private CursorPagerAdapter cursorPagerAdapter;
-        HashMap<Integer, Cursor> mapCursor;
-        View includeTitleBackground;
-        View includeExtraBackground;
-        View includeExtraTimeImage;
-        View includeExtraPhotoImage;
+        final  HashMap<Integer, Cursor> mapCursor;
+        final View includeTitleBackground;
+        final View includeExtraBackground;
+        final View includeExtraTimeImage;
+        final View includeExtraPhotoImage;
         int positionCursorPhotos = 0;
 
 
@@ -164,7 +164,7 @@ public class BlogCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView.Vi
 
         private String getDifferenceTime(Context context, String stringDate) {
             SimpleDateFormat simpleDateFormat =
-                    new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+                    new SimpleDateFormat("dd-MM-yyyy hh:mm:ss", java.util.Locale.getDefault());
             String year, month, day, time;
             if (stringDate.contains("-")) {
                 year = stringDate.substring(0, stringDate.indexOf("-"));
@@ -258,9 +258,9 @@ public class BlogCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView.Vi
 
 
         private class CursorPagerAdapter extends PagerAdapter {
-            public Cursor cursor;
+            public final Cursor cursor;
             public Cursor cursorPhotos;
-            private LayoutInflater inflater;
+            private final LayoutInflater inflater;
 
             public CursorPagerAdapter(Cursor cursor, Cursor cursorPhotos) {
                 super();
@@ -327,9 +327,9 @@ public class BlogCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView.Vi
                     return null;
                 int count = cursor.getCount();
                 if (count != 0)
-                    photo.setText("1 / " + cursor.getCount());
+                    photo.setText(context.getString(R.string.photosSlideCount,1,cursor.getCount()));
                 else
-                    photo.setText("0 / " + cursor.getCount());
+                    photo.setText(context.getString(R.string.photosSlideCount,0,cursor.getCount()));
                 return cursor;
             }
 

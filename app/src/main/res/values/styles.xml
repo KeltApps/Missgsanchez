@@ -11,6 +11,7 @@
 
     <style name="AppTheme.NoActionBar">
         <item name="spinBars">true</item>
+        <item name="android:background">@android:color/black</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -44,6 +45,12 @@
 
     <style name="Text_White_Body">
         <item name="android:alpha">@dimen/alpha.darkBackground.text.secondary</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">@dimen/size.text.body</item>
+    </style>
+
+    <style name="Text_White_Title_Small">
+        <item name="android:alpha">@dimen/alpha.darkBackground.text.primary</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">@dimen/size.text.body</item>
     </style>

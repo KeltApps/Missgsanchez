@@ -10,11 +10,9 @@ import com.keltapps.missgsanchez.fragments.SlideScreenImagePageFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by sergio on 21/02/16 for KelpApps.
- */
+
 public class SlideScreenImagePagerAdapter extends FragmentStatePagerAdapter {
-    List<String> arrayPhotos;
+    private final List<String> arrayPhotos;
 
     public SlideScreenImagePagerAdapter(FragmentManager fm, List<String> arrayPhotos) {
         super(fm);

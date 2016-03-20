@@ -2,16 +2,14 @@ package com.keltapps.missgsanchez.utils;
 
 import android.provider.BaseColumns;
 
-/**
- * Created by sergio on 1/01/16 for KelpApps.
- */
+
 public class ScriptDatabase {
 
     public static final String BLOG_TABLE_NAME = "blog";
     public static final String PHOTOS_BLOG_TABLE_NAME = "photosBlog";
     public static final String INSTAGRAM_TABLE_NAME = "instagram";
-    public static final String STRING_TYPE = "TEXT";
-    public static final String INT_TYPE = "INTEGER";
+    private static final String STRING_TYPE = "TEXT";
+    private static final String INT_TYPE = "INTEGER";
 
     public static class ColumnBlog implements BaseColumns {
         public static final String ID = _ID;

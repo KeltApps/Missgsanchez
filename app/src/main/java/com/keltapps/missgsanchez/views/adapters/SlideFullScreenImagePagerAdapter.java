@@ -9,11 +9,9 @@ import com.keltapps.missgsanchez.fragments.SlideFullScreenImagePageFragment;
 
 import java.util.List;
 
-/**
- * Created by sergio on 2/03/16 for KelpApps.
- */
+
 public class SlideFullScreenImagePagerAdapter extends FragmentStatePagerAdapter {
-    List<String> arrayPhotos;
+    private final List<String> arrayPhotos;
 
     public SlideFullScreenImagePagerAdapter(FragmentManager fm, List<String> arrayPhotos) {
         super(fm);

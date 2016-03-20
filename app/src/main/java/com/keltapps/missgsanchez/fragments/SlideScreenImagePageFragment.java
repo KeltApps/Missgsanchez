@@ -13,14 +13,12 @@ import com.keltapps.missgsanchez.network.VolleySingleton;
 
 import java.util.List;
 
-/**
- * Created by sergio on 12/02/16 for KelpApps.
- */
+
 public class SlideScreenImagePageFragment extends Fragment {
     private static final String TAG = SlideScreenImagePageFragment.class.getSimpleName();
-    public static String TAG_ARGS_URL_PHOTO = "args_url_photo";
-    public static String TAG_ARGS_ARRAY_LIST_PHOTOS = "args_array_list_photos";
-    public static String TAG_ARGS_ACTUAL_POSITION = "args_actual_position";
+    public static final String TAG_ARGS_URL_PHOTO = "args_url_photo";
+    public static final String TAG_ARGS_ARRAY_LIST_PHOTOS = "args_array_list_photos";
+    public static final String TAG_ARGS_ACTUAL_POSITION = "args_actual_position";
 
 
     @Override

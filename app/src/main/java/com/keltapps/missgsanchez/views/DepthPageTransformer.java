@@ -3,9 +3,7 @@ package com.keltapps.missgsanchez.views;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
-/**
- * Created by sergio on 7/02/16 for KelpApps.
- */
+
 public class DepthPageTransformer implements ViewPager.PageTransformer {
     private static final float MIN_SCALE = 0.75f;
 

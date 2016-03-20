@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#000000</color>
-    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorPrimary">#616161</color>
+    <color name="colorPrimaryDark">#212121</color>
+    <color name="colorPrimaryDark2">#bba059</color>
     <color name="colorAccent">#D3B565</color>
     <color name="colorAccent.disabled">#D4C7B1</color>
     <color name="colorBackground">#FFFFFF</color>
+
+    <color name="color.tabs.textNormal">#D4C7B1</color>
+    <color name="color.tabs.textSelected">#FFFFFF</color>
+    <color name="colorLink">#0d47a1</color>
 </resources>

@@ -11,9 +11,7 @@ import android.view.ViewGroup;
 
 import com.keltapps.missgsanchez.R;
 
-/**
- * Created by sergio on 10/01/16 for KelpApps.
- */
+
 public class SplashFragment extends Fragment {
     private static final String TAG = SplashFragment.class.getSimpleName();
 
@@ -25,7 +23,7 @@ public class SplashFragment extends Fragment {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor editor = pref.edit();
         editor.putBoolean(BlogInsidePostFragment.TAG_ANIM, false);
-        editor.commit();
+        editor.apply();
         return rootView;
     }
 

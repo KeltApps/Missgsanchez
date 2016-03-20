@@ -24,15 +24,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Created by sergio on 1/01/16 for KelpApps.
- */
+
 public class FeedDatabase extends SQLiteOpenHelper {
     private static final String TAG = FeedDatabase.class.getSimpleName();
     private static final String TAG_EMPTY_PAGE = "[]";
     public static final int RETURN_NO_OLD_POST = 0;
     public static final int RETURN_OLD_POST = 1;
     public static final int RETURN_EMPTY_PAGE = 2;
+    public static final String RETURN_INSTAGRAM_OLD_POST = "oldPost";
 
     public static final String DATABASE_NAME = "Feed.db";
 
@@ -81,7 +80,7 @@ public class FeedDatabase extends SQLiteOpenHelper {
     /**
      * Insert a record in table entry
      */
-    public void insertEntry(
+    private void insertEntry(
             int idPost,
             String title,
             String date,
@@ -103,7 +102,7 @@ public class FeedDatabase extends SQLiteOpenHelper {
     }
 
 
-    public void updateEntry(int id,
+    private void updateEntry(int id,
                             int idPost,
                             String title,
                             String date,
@@ -177,7 +176,7 @@ public class FeedDatabase extends SQLiteOpenHelper {
     /**
      * Insert a record in table photoBlog
      */
-    public void insertPhotoBlog(
+    private void insertPhotoBlog(
             int idPost,
             String urlPhoto) {
 
@@ -192,7 +191,7 @@ public class FeedDatabase extends SQLiteOpenHelper {
         );
     }
 
-    public Cursor getPhotosBlogId(int idPost) {
+    private Cursor getPhotosBlogId(int idPost) {
         return getWritableDatabase().rawQuery(
                 "select * from " + ScriptDatabase.PHOTOS_BLOG_TABLE_NAME + " where " + ScriptDatabase.ColumnPhotosBlog.ID_POST + " = " + idPost, null);
     }
@@ -203,7 +202,6 @@ public class FeedDatabase extends SQLiteOpenHelper {
         List<String> listPhotos = new LinkedList<>();
         for (Element element : elementsPhotos) {
             String urlPhoto = element.attr("src");
-            Log.v("prueba", "PHOTO FOUNDED: " + urlPhoto);
             if (!urlPhoto.isEmpty())
                 listPhotos.add(element.attr("src"));
         }
@@ -224,7 +222,7 @@ public class FeedDatabase extends SQLiteOpenHelper {
     }
 
 
-    public void insertInstagram(String idPost, String urlProfilePhoto, String user, String location,
+    private void insertInstagram(String idPost, String urlProfilePhoto, String user, String location,
                                 int time, String urlPhoto, int likes, String title) {
 
         ContentValues values = new ContentValues();
@@ -244,7 +242,7 @@ public class FeedDatabase extends SQLiteOpenHelper {
         );
     }
 
-    public void updateInstagram(int id, String idPost, String urlProfilePhoto, String user, String location,
+    private void updateInstagram(int id, String idPost, String urlProfilePhoto, String user, String location,
                                 int time, String urlPhoto, int likes, String title) {
 
         ContentValues values = new ContentValues();
@@ -266,40 +264,43 @@ public class FeedDatabase extends SQLiteOpenHelper {
     }
 
 
-    public Cursor getInstagram(int idPost) {
+    private Cursor getInstagram() {
         return getWritableDatabase().rawQuery(
-                "select * from " + ScriptDatabase.INSTAGRAM_TABLE_NAME + " where " + ScriptDatabase.ColumnInstagram.ID_POST + " = " + idPost, null);
+                "select * from " + ScriptDatabase.INSTAGRAM_TABLE_NAME, null);
     }
 
-    public int synchronizeInstagram(String data) {
 
+    public int synchronizeInstagram(String data) {
+        int intReturn = RETURN_NO_OLD_POST;
         Type fooType = new TypeToken<InstagramItem>() {
         }.getType();
         InstagramItem instagramItem = new GsonBuilder().create().fromJson(data, fooType);
-
+        if(!instagramItem.isMoreAvailable())
+            return RETURN_EMPTY_PAGE;
         HashMap<String, InstagramItem.InstagramSubItem> entryMap = new HashMap<>();
         List<InstagramItem.InstagramSubItem> instagramSubItems = instagramItem.getListSubItem();
-        for (InstagramItem.InstagramSubItem instagramSubItem : instagramSubItems) 
+        for (InstagramItem.InstagramSubItem instagramSubItem : instagramSubItems)
             entryMap.put(instagramSubItem.getId(), instagramSubItem);
-        Cursor c = getEntries();
+        Cursor c = getInstagram();
         assert c != null;
-        Boolean oldPost = false;
 
-       while (c.moveToNext()) {
-            String postId = c.getString((c.getColumnIndex(ScriptDatabase.ColumnInstagram.ID_POST));
+        while (c.moveToNext()) {
+            String postId = c.getString(c.getColumnIndex(ScriptDatabase.ColumnInstagram.ID_POST));
             InstagramItem.InstagramSubItem match = entryMap.get(postId);
             if (match != null) {
                 entryMap.remove(postId);
-                oldPost = true;
-                if (match.getId() != postId) {
+                intReturn = RETURN_OLD_POST;
+                if (!match.getId().equals(postId)) {
                     updateInstagram(
-                            c.getInt(c.getColumnIndex(ScriptDatabase.ColumnInstagram.ID_POST)),
+                            c.getInt(c.getColumnIndex(ScriptDatabase.ColumnInstagram.ID)),
                             match.getId(),
-							match.getInstagramUser().getProfilePicture(),
-							match.getInstagramUser().getUserName(),
-				       	   match.getInstagramImages().getLowResolution().getUrl(),
+                            match.getInstagramUser().getProfilePicture(),
+                            match.getInstagramUser().getUserName(),
+                            match.getLocation().getName(),
+                            match.getTime(),
+                            match.getInstagramImages().getStandard_resolution().getUrl(),
                             match.getInstagramLikes().getCount(),
-                            match.title
+                            match.getCaption().getTitle()
                     );
 
                 }
@@ -307,18 +308,23 @@ public class FeedDatabase extends SQLiteOpenHelper {
         }
         c.close();
         for (InstagramItem.InstagramSubItem article : entryMap.values()) {
-            Log.i(TAG, "insert instagram: " );
-            insertEntry(
+            Log.i(TAG, "insert instagram: " + article.getId());
+            String location= "";
+            if( article.getLocation() != null)
+                location = article.getLocation().getName();
+
+            insertInstagram(
                     article.getId(),
-				article.getInstagramUser().getProfilePicture(),
-				article.getInstagramUser().getUserName(),
-				article.getInstagramImages().getLowResolution().getUrl(),
-				article.getInstagramLikes().getCount(),
-				article.title
+                    article.getInstagramUser().getProfilePicture(),
+                    article.getInstagramUser().getUserName(),
+                    location,
+                    article.getTime(),
+                    article.getInstagramImages().getStandard_resolution().getUrl(),
+                    article.getInstagramLikes().getCount(),
+                    article.getCaption().getTitle()
             );
         }
-
-        return oldPost ? RETURN_OLD_POST : RETURN_NO_OLD_POST;
+        return intReturn;
     }
 
 

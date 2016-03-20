@@ -34,8 +34,8 @@ import java.util.List;
 public class BlogTabFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, Response.Listener<String>, Response.ErrorListener {
     private static final String TAG = BlogCursorAdapter.class.getSimpleName();
     private static final String TAG_LIMIT_QUERY = "limit_query";
-    BlogCursorAdapter blogCursorAdapter;
-    boolean loading = true;
+    private BlogCursorAdapter blogCursorAdapter;
+    private boolean loading = true;
     public static boolean noMorePages = false;
     private int totalItemCount;
 
@@ -45,7 +45,7 @@ public class BlogTabFragment extends Fragment implements LoaderManager.LoaderCal
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_post, container, false);
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_post_recyclerView);
-        blogCursorAdapter = new BlogCursorAdapter(getActivity(), null);
+        blogCursorAdapter = new BlogCursorAdapter(getActivity());
         recyclerView.setAdapter(blogCursorAdapter);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayout.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -67,7 +67,7 @@ public class BlogTabFragment extends Fragment implements LoaderManager.LoaderCal
                     if (loading) {
                         if ((visibleItemCount + pastVisibleItems) >= totalItemCount - 2) {
                             loading = false;
-                            int numberPage = (int) Math.ceil((totalItemCount - 1) * 1.0 / VolleySingleton.POST_PER_PAGE) + 1;
+                            int numberPage = (int) Math.ceil((totalItemCount - 1) * 1.0 / VolleySingleton.BLOG_POST_PER_PAGE) + 1;
                             VolleySingleton.getInstance(getActivity()).addToRequestQueue(new StringRequest(Request.Method.GET,
                                     VolleySingleton.URL_GET_BLOG + numberPage,
                                     BlogTabFragment.this, BlogTabFragment.this));
@@ -85,14 +85,20 @@ public class BlogTabFragment extends Fragment implements LoaderManager.LoaderCal
         blogCursorAdapter = null;
     }
 
+    /**
+     * Create sql query
+     *
+     * @param oldPost        if it is true, totalItemCount is ignored
+     * @param totalItemCount Actual number of items in the adapter
+     */
     private void sqlQuery(boolean oldPost, int totalItemCount) {
         Bundle bundle = new Bundle();
         if (oldPost) {
             bundle.putInt(TAG_LIMIT_QUERY, 0);
             getLoaderManager().initLoader(0, bundle, this);
         } else {
-            bundle.putInt(TAG_LIMIT_QUERY, totalItemCount + VolleySingleton.POST_PER_PAGE);
-            getLoaderManager().initLoader(totalItemCount + VolleySingleton.POST_PER_PAGE, bundle, this);
+            bundle.putInt(TAG_LIMIT_QUERY, totalItemCount + VolleySingleton.BLOG_POST_PER_PAGE);
+            getLoaderManager().initLoader(totalItemCount + VolleySingleton.BLOG_POST_PER_PAGE, bundle, this);
         }
     }
 

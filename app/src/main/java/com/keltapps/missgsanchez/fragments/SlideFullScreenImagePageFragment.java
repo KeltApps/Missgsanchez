@@ -1,6 +1,7 @@
 package com.keltapps.missgsanchez.fragments;
 
 import android.animation.ValueAnimator;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
@@ -16,12 +17,10 @@ import com.keltapps.missgsanchez.network.LoadImages;
 import com.keltapps.missgsanchez.network.VolleySingleton;
 import com.keltapps.missgsanchez.views.TouchImageView;
 
-/**
- * Created by sergio on 21/02/16 for KelpApps.
- */
+
 public class SlideFullScreenImagePageFragment extends Fragment {
     private static final String TAG = SlideFullScreenImagePageFragment.class.getSimpleName();
-    public static String TAG_ARGS_URL_PHOTO = "args_url_photo";
+    public static final String TAG_ARGS_URL_PHOTO = "args_url_photo";
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
@@ -51,7 +50,7 @@ public class SlideFullScreenImagePageFragment extends Fragment {
                 return false;
             }
         });
-        TouchImageView touchImageView = (TouchImageView) rootView.findViewById(R.id.fragment_slide_full_screen_image_view);
+        TouchImageView touchImageView = (TouchImageView) imageView;
         touchImageView.setClickDetector(clickDetector);
 
         String urlMiniature, urlMiniatureFullResolution, urlMiniatureName;
@@ -68,25 +67,29 @@ public class SlideFullScreenImagePageFragment extends Fragment {
     }
 
     private void hideSystemUI(final View mDecorView, Toolbar toolbar) {
-        mDecorView.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-        );
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            mDecorView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            );
+        }
         animateHeight(toolbar, (int) toolbar.getY(), -1 * toolbar.getHeight(), 500);
     }
 
     private void showSystemUI(View mDecorView, Toolbar toolbar, int statusBarHeight) {
-        mDecorView.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            mDecorView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
         animateHeight(toolbar, (int) toolbar.getY(), statusBarHeight, 500);
     }
 
-    public void animateHeight(final View view, int from, int to, int duration) {
+    private void animateHeight(final View view, int from, int to, int duration) {
         ValueAnimator anim = ValueAnimator.ofInt(from, to);
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override

@@ -8,6 +8,7 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -33,7 +34,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         NavigationView navigationView = (NavigationView) findViewById(R.id.activity_main_nav_view);
@@ -56,9 +59,11 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
     }
 
     @Override
@@ -141,6 +146,8 @@ public class MainActivity extends AppCompatActivity
         PagerAdapter pagerAdapter = new MainTabsAdapter(getSupportFragmentManager(), this);
         viewPager.setAdapter(pagerAdapter);
         tabs.setupWithViewPager(viewPager);
+        tabs.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        tabs.setTabTextColors(ContextCompat.getColor(this, R.color.color_tabs_textNormal),ContextCompat.getColor(this, R.color.color_tabs_textSelected));
         TabLayout.Tab tab = tabs.getTabAt(MainTabsAdapter.TAB_BLOG);
         if(tab != null)
             tab.select();

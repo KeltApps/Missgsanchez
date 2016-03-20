@@ -7,11 +7,27 @@ import java.util.List;
 
 public class InstagramItem {
     @SerializedName("status")
-    String status;
-    @SerializedName("items")
-    List<InstagramSubItem> listSubItem;
+    private String status;
     @SerializedName("more_available")
-    boolean moreAvailable;
+    private boolean moreAvailable;
+    @SerializedName("items")
+    private List<InstagramSubItem> listSubItem;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public boolean isMoreAvailable() {
+        return moreAvailable;
+    }
+
+    public void setMoreAvailable(boolean moreAvailable) {
+        this.moreAvailable = moreAvailable;
+    }
 
 
     public class InstagramSubItem {
@@ -25,21 +41,33 @@ public class InstagramItem {
         String id;
         @SerializedName("user")
         InstagramUser instagramUser;
+        @SerializedName("caption")
+        Caption caption;
+        @SerializedName("created_time")
+        int time;
 
-        public class InstagramLocation{
+        public class InstagramLocation {
             @SerializedName("name")
             String name;
 
-            public String getname() {
+            public String getName() {
                 return name;
             }
 
-            public void setname(String location) {
+            public void setName(String name) {
                 this.name = name;
             }
         }
 
-        public class InstagramResolutionImages{
+        public InstagramLocation getLocation() {
+            return location;
+        }
+
+        public void setLocation(InstagramLocation location) {
+            this.location = location;
+        }
+
+        public class InstagramResolutionImages {
             @SerializedName("low_resolution")
             InstagramImages lowResolution;
             @SerializedName("thumbnail")
@@ -70,6 +98,39 @@ public class InstagramItem {
             public void setStandard_resolution(InstagramImages standard_resolution) {
                 this.standard_resolution = standard_resolution;
             }
+
+            public class InstagramImages {
+                @SerializedName("url")
+                String url;
+                @SerializedName("width")
+                String width;
+                @SerializedName("height")
+                String height;
+
+                public String getUrl() {
+                    return url;
+                }
+
+                public void setUrl(String url) {
+                    this.url = url;
+                }
+
+                public String getWidth() {
+                    return width;
+                }
+
+                public void setWidth(String width) {
+                    this.width = width;
+                }
+
+                public String getHeight() {
+                    return height;
+                }
+
+                public void setHeight(String height) {
+                    this.height = height;
+                }
+            }
         }
 
 
@@ -79,6 +140,21 @@ public class InstagramItem {
 
         public void setInstagramImages(InstagramResolutionImages instagramImages) {
             this.instagramImages = instagramImages;
+        }
+
+
+        public class InstagramLikes {
+            @SerializedName("count")
+            int count;
+
+
+            public void setCount(int count) {
+                this.count = count;
+            }
+
+            public int getCount() {
+                return count;
+            }
         }
 
         public InstagramLikes getInstagramLikes() {
@@ -97,6 +173,30 @@ public class InstagramItem {
             this.id = id;
         }
 
+        public class InstagramUser {
+            @SerializedName("username")
+            String userName;
+            @SerializedName("profile_picture")
+            String profilePicture;
+
+            public void setUserName(String userName) {
+                this.userName = userName;
+            }
+
+            public String getUserName() {
+                return userName;
+            }
+
+
+            public void setProfilePicture(String profilePicture) {
+                this.profilePicture = profilePicture;
+            }
+
+            public String getProfilePicture() {
+                return profilePicture;
+            }
+        }
+
         public InstagramUser getInstagramUser() {
             return instagramUser;
         }
@@ -104,91 +204,35 @@ public class InstagramItem {
         public void setInstagramUser(InstagramUser instagramUser) {
             this.instagramUser = instagramUser;
         }
-    }
 
-    public class InstagramImages {
-        @SerializedName("url")
-        String url;
-        @SerializedName("width")
-        String width;
-        @SerializedName("height")
-        String height;
+        public class Caption{
+            @SerializedName("text")
+            String title;
 
-        public String getUrl() {
-            return url;
+            public String getTitle() {
+                return title;
+            }
+
+            public void setTitle(String title) {
+                this.title = title;
+            }
         }
 
-        public void setUrl(String url) {
-            this.url = url;
+        public Caption getCaption() {
+            return caption;
         }
 
-        public String getWidth() {
-            return width;
+        public void setCaption(Caption caption) {
+            this.caption = caption;
         }
 
-        public void setWidth(String width) {
-            this.width = width;
+        public int getTime() {
+            return time;
         }
 
-        public String getHeight() {
-            return height;
+        public void setTime(int time) {
+            this.time = time;
         }
-
-        public void setHeight(String height) {
-            this.height = height;
-        }
-    }
-
-    public class InstagramLikes {
-        @SerializedName("count")
-        int count;
-
-
-		public void setCount(int count)
-		{
-			this.count = count;
-		}
-
-		public int getCount()
-		{
-			return count;
-		}}
-
-    public class InstagramUser {
-        @SerializedName("username")
-        String userName;
-        @SerializedName("profile_picture")
-        String profilePicture;
-
-		public void setUserName(String userName)
-		{
-			this.userName = userName;
-		}
-
-		public String getUserName()
-		{
-			return userName;
-		}
-		
-
-
-		public void setProfilePicture(String profilePicture)
-		{
-			this.profilePicture = profilePicture;
-		}
-
-		public String getProfilePicture()
-		{
-			return profilePicture;
-		}
-		}
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public List<InstagramSubItem> getListSubItem() {
@@ -199,11 +243,4 @@ public class InstagramItem {
         this.listSubItem = listSubItem;
     }
 
-    public boolean isMoreAvailable() {
-        return moreAvailable;
-    }
-
-    public void setMoreAvailable(boolean moreAvailable) {
-        this.moreAvailable = moreAvailable;
-    }
 }

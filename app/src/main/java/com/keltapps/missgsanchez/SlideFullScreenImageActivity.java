@@ -1,6 +1,7 @@
 package com.keltapps.missgsanchez;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.view.PagerAdapter;
@@ -20,9 +21,9 @@ import java.util.List;
 
 public class SlideFullScreenImageActivity extends AppCompatActivity {
     private static final String TAG = SlideFullScreenImageActivity.class.getSimpleName();
-    public static String TAG_ARGS_ARRAY_LIST_PHOTOS = "args_array_list_photos";
-    public static String TAG_ARGS_ACTUAL_POSITION = "args_actual_position";
-    public static String TAG_ARGS_STATUS_BAR_HEIGHT = "args_status_bar_height";
+    public static final String TAG_ARGS_ARRAY_LIST_PHOTOS = "args_array_list_photos";
+    public static final String TAG_ARGS_ACTUAL_POSITION = "args_actual_position";
+    public static final String TAG_ARGS_STATUS_BAR_HEIGHT = "args_status_bar_height";
     private String urlImage;
 
     @Override
@@ -31,10 +32,12 @@ public class SlideFullScreenImageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_slide_full_screen_image);
         Intent intent = getIntent();
         final List<String> listPhotos = intent.getStringArrayListExtra(TAG_ARGS_ARRAY_LIST_PHOTOS);
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
         int statusBarHeight = intent.getIntExtra(TAG_ARGS_STATUS_BAR_HEIGHT, 0);
         Toolbar toolbar = (Toolbar) findViewById(R.id.activity_full_screen_toolbar);
         toolbar.setY(statusBarHeight);

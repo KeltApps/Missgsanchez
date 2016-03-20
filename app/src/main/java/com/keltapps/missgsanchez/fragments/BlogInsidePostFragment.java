@@ -48,13 +48,13 @@ import java.util.Scanner;
 
 public class BlogInsidePostFragment extends Fragment {
     private static final String TAG = BlogInsidePostFragment.class.getSimpleName();
-    public static String TAG_ARGS_ARRAY_LIST_PHOTOS = "args_array_list_photos";
-    public static String TAG_ARGS_ACTUAL_POSITION = "args_actual_position";
-    public static String TAG_ARGS_TIME_AGO = "args_time_ago";
-    public static String TAG_ARGS_TITLE = "args_title";
-    public static String TAG_ARGS_CONTENT = "args_content";
-    public static String TAG_ARGS_URL_POST = "args_url_post";
-    public static String TAG_ANIM = "anim";
+    public static final String TAG_ARGS_ARRAY_LIST_PHOTOS = "args_array_list_photos";
+    public static final String TAG_ARGS_ACTUAL_POSITION = "args_actual_position";
+    public static final  String TAG_ARGS_TIME_AGO = "args_time_ago";
+    public static final String TAG_ARGS_TITLE = "args_title";
+    public static final String TAG_ARGS_CONTENT = "args_content";
+    public static final String TAG_ARGS_URL_POST = "args_url_post";
+    public static final String TAG_ANIM = "anim";
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
@@ -117,7 +117,7 @@ public class BlogInsidePostFragment extends Fragment {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor editor = pref.edit();
         editor.putBoolean(TAG_ANIM, true);
-        editor.commit();
+        editor.apply();
 
         final Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.inside_post_toolbar);
 

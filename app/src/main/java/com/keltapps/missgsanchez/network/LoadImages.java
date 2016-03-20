@@ -9,9 +9,7 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 
-/**
- * Created by sergio on 13/01/16 for KelpApps.
- */
+
 public class LoadImages {
 
     /**
@@ -40,7 +38,7 @@ public class LoadImages {
 
                         @Override
                         public void onError() {
-                            picasso.with(context)
+                            Picasso.with(context)
                                     .load(urlLowResolution)
                                     .fit()
                                     .centerCrop()
@@ -60,7 +58,7 @@ public class LoadImages {
 
                         @Override
                         public void onError() {
-                            picasso.with(context)
+                            Picasso.with(context)
                                     .load(urlLowResolution)
                                     .fit()
                                     .centerCrop()
@@ -89,7 +87,7 @@ public class LoadImages {
 
                         @Override
                         public void onError() {
-                            picasso.with(context)
+                            Picasso.with(context)
                                     .load(urlLowResolution)
                                     .fit()
                                     .centerInside()
@@ -109,7 +107,7 @@ public class LoadImages {
 
                         @Override
                         public void onError() {
-                            picasso.with(context)
+                            Picasso.with(context)
                                     .load(urlLowResolution)
                                     .fit()
                                     .centerInside()
