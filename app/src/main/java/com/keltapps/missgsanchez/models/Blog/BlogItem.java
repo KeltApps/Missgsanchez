@@ -1,4 +1,4 @@
-package com.keltapps.missgsanchez.models;
+package com.keltapps.missgsanchez.models.Blog;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -9,12 +9,12 @@ public class BlogItem {
     @SerializedName("id")
     private int idPost;
     @SerializedName("title")
-    private JSONRendered jsonRenderedTitle;
+    private BlogRendered blogRenderedTitle;
     @SerializedName("date_gmt")
     private String datePost;
     private transient List<String> listPhotos;
     @SerializedName("content")
-    private JSONRendered jsonRenderedContent;
+    private BlogRendered blogRenderedContent;
     @SerializedName("link")
     private String url;
 
@@ -27,12 +27,12 @@ public class BlogItem {
         this.idPost = idPost;
     }
 
-    public JSONRendered getJsonRenderedTitle() {
-        return jsonRenderedTitle;
+    public BlogRendered getBlogRenderedTitle() {
+        return blogRenderedTitle;
     }
 
-    public void setJsonRenderedTitle(JSONRendered jsonRenderedTitle) {
-        this.jsonRenderedTitle = jsonRenderedTitle;
+    public void setBlogRenderedTitle(BlogRendered blogRenderedTitle) {
+        this.blogRenderedTitle = blogRenderedTitle;
     }
 
     public String getDatePost() {
@@ -47,12 +47,12 @@ public class BlogItem {
         return listPhotos;
     }
 
-    public JSONRendered getJsonRenderedContent() {
-        return jsonRenderedContent;
+    public BlogRendered getBlogRenderedContent() {
+        return blogRenderedContent;
     }
 
-    public void setJsonRenderedContent(JSONRendered jsonRenderedContent) {
-        this.jsonRenderedContent = jsonRenderedContent;
+    public void setBlogRenderedContent(BlogRendered blogRenderedContent) {
+        this.blogRenderedContent = blogRenderedContent;
     }
 
     public void setListPhotos(List<String> listPhotos) {
@@ -65,19 +65,6 @@ public class BlogItem {
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public class JSONRendered {
-        @SerializedName("rendered")
-        private String string;
-
-        public String getString() {
-            return string;
-        }
-
-        public void setString(String string) {
-            this.string = string;
-        }
     }
 
 }

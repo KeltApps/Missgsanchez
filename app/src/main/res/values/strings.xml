@@ -19,6 +19,7 @@
     <string name="fragment.instagramTabFragment">InstagramTabFragment</string>
     <string name="fragment.blogInsidePostFragment">BlogInsidePostFragment</string>
     <string name="fragment.slideFullScreenImagePageFragment">SlideFullScreenImagePageFragment</string>
+    <string name="fragment.myYouTubePlayerFragment">MyYouTubePlayerFragment</string>
 
     <string name="loadMore.post">Loading more post&#8230;</string>
 
@@ -36,4 +37,7 @@
     <!--Instagram-->
     <string name="instagram.likes">%1$d likes</string>
     <string name="instagram.userLocation">%1$s\n%2$s</string>
+
+    <!--YouTube-->
+    <string name="youtube.viewTime">%1$s views  %2$s</string>
 </resources>

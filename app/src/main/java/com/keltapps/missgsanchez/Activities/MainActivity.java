@@ -1,4 +1,4 @@
-package com.keltapps.missgsanchez;
+package com.keltapps.missgsanchez.Activities;
 
 import android.content.Intent;
 import android.graphics.Rect;
@@ -16,21 +16,27 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 
+import com.keltapps.missgsanchez.R;
 import com.keltapps.missgsanchez.fragments.BlogInsidePostFragment;
 import com.keltapps.missgsanchez.fragments.BlogTabFragment;
 import com.keltapps.missgsanchez.fragments.SplashFragment;
+import com.keltapps.missgsanchez.fragments.YouTubeTabFragment;
 import com.keltapps.missgsanchez.views.adapters.MainTabsAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements BlogTabFragment.OnBlogTabListener, NavigationView.OnNavigationItemSelectedListener, BlogInsidePostFragment.OnImageFullScreenListener {
+        implements BlogTabFragment.OnBlogTabListener, NavigationView.OnNavigationItemSelectedListener, BlogInsidePostFragment.OnImageFullScreenListener,
+        YouTubeTabFragment.OnYouTubeFullScreenListener {
     private static final String TAG = MainActivity.class.getSimpleName();
+    public final static String ACTION_INSTAGRAM_SELECTED = "com.keltapps.missgsanchez.ACTION_INSTAGRAM_SELECTED";
+    public final static String ACTION_INSTAGRAM_NOT_SELECTED = "com.keltapps.missgsanchez.ACTION_INSTAGRAM_NOT_SELECTED";
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -38,7 +44,9 @@ public class MainActivity extends AppCompatActivity
             getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         }
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate: ");
         setContentView(R.layout.activity_main);
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.activity_main_nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         setUpTabs();
@@ -57,6 +65,9 @@ public class MainActivity extends AppCompatActivity
         if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+            Log.d(TAG, "onBackPressed: ");
+
+
             super.onBackPressed();
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -147,10 +158,37 @@ public class MainActivity extends AppCompatActivity
         viewPager.setAdapter(pagerAdapter);
         tabs.setupWithViewPager(viewPager);
         tabs.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
-        tabs.setTabTextColors(ContextCompat.getColor(this, R.color.color_tabs_textNormal),ContextCompat.getColor(this, R.color.color_tabs_textSelected));
+        tabs.setTabTextColors(ContextCompat.getColor(this, R.color.color_tabs_textNormal), ContextCompat.getColor(this, R.color.color_tabs_textSelected));
         TabLayout.Tab tab = tabs.getTabAt(MainTabsAdapter.TAB_BLOG);
-        if(tab != null)
+        if (tab != null)
             tab.select();
+        tabs.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition() == MainTabsAdapter.TAB_INSTAGRAM) {
+                    Log.d(TAG, "onTabSelected: ");
+                    Intent intent = new Intent(ACTION_INSTAGRAM_SELECTED);
+                    sendBroadcast(intent);
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                if (tab.getPosition() == MainTabsAdapter.TAB_INSTAGRAM) {
+                    Intent intent = new Intent(ACTION_INSTAGRAM_NOT_SELECTED);
+                    sendBroadcast(intent);
+                }
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                Log.d(TAG, "onTabReselected: ");
+                if (tab.getPosition() == MainTabsAdapter.TAB_INSTAGRAM) {
+                    Intent intent = new Intent(ACTION_INSTAGRAM_SELECTED);
+                    sendBroadcast(intent);
+                }
+            }
+        });
     }
 
     @Override
@@ -167,4 +205,11 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
+
+    @Override
+    public void onClickYouTubeFullScreenListener(String idVideo) {
+        Intent intent = new Intent(this, YouTubeVideoFullScreenActivity.class);
+        intent.putExtra(YouTubeVideoFullScreenActivity.TAG_ARGS_ID_VIDEO, idVideo);
+        startActivity(intent);
+    }
 }

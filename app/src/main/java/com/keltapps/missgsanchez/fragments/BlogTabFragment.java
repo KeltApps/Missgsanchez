@@ -12,6 +12,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.keltapps.missgsanchez.R;
+import com.keltapps.missgsanchez.network.BlogAPI;
 import com.keltapps.missgsanchez.network.VolleySingleton;
 import com.keltapps.missgsanchez.utils.EntryProvider;
 import com.keltapps.missgsanchez.utils.FeedDatabase;
@@ -43,16 +45,14 @@ public class BlogTabFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_post, container, false);
+        Log.d(TAG, "onCreateView: hooooolaaaa");
+        View rootView = inflater.inflate(R.layout.fragment_blog, container, false);
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_post_recyclerView);
         blogCursorAdapter = new BlogCursorAdapter(getActivity());
         recyclerView.setAdapter(blogCursorAdapter);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayout.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        VolleySingleton.getInstance(getActivity()).addToRequestQueue(new StringRequest(Request.Method.GET,
-                VolleySingleton.URL_GET_BLOG + 0,
-                BlogTabFragment.this, BlogTabFragment.this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -67,15 +67,19 @@ public class BlogTabFragment extends Fragment implements LoaderManager.LoaderCal
                     if (loading) {
                         if ((visibleItemCount + pastVisibleItems) >= totalItemCount - 2) {
                             loading = false;
-                            int numberPage = (int) Math.ceil((totalItemCount - 1) * 1.0 / VolleySingleton.BLOG_POST_PER_PAGE) + 1;
+                            int numberPage = (int) Math.ceil((totalItemCount - 1) * 1.0 / BlogAPI.getPostPerPage()) + 1;
                             VolleySingleton.getInstance(getActivity()).addToRequestQueue(new StringRequest(Request.Method.GET,
-                                    VolleySingleton.URL_GET_BLOG + numberPage,
+                                    BlogAPI.getPostUrlGet(numberPage),
                                     BlogTabFragment.this, BlogTabFragment.this));
                         }
                     }
                 }
             }
         });
+
+        VolleySingleton.getInstance(getActivity()).addToRequestQueue(new StringRequest(Request.Method.GET,
+                BlogAPI.getPostUrlGet(1),
+                BlogTabFragment.this, BlogTabFragment.this));
         return rootView;
     }
 
@@ -97,8 +101,8 @@ public class BlogTabFragment extends Fragment implements LoaderManager.LoaderCal
             bundle.putInt(TAG_LIMIT_QUERY, 0);
             getLoaderManager().initLoader(0, bundle, this);
         } else {
-            bundle.putInt(TAG_LIMIT_QUERY, totalItemCount + VolleySingleton.BLOG_POST_PER_PAGE);
-            getLoaderManager().initLoader(totalItemCount + VolleySingleton.BLOG_POST_PER_PAGE, bundle, this);
+            bundle.putInt(TAG_LIMIT_QUERY, totalItemCount + BlogAPI.getPostPerPage());
+            getLoaderManager().initLoader(totalItemCount + BlogAPI.getPostPerPage(), bundle, this);
         }
     }
 

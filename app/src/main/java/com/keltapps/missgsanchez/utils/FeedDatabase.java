@@ -5,12 +5,18 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.keltapps.missgsanchez.models.BlogItem;
-import com.keltapps.missgsanchez.models.InstagramItem;
+import com.keltapps.missgsanchez.models.Blog.BlogItem;
+import com.keltapps.missgsanchez.models.Instagram.InstagramItem;
+import com.keltapps.missgsanchez.models.Instagram.InstagramSubItem;
+import com.keltapps.missgsanchez.models.YouTube.YouTubeSearchChannelItem;
+import com.keltapps.missgsanchez.models.YouTube.YouTubeSearchChannelSubItem;
+import com.keltapps.missgsanchez.models.YouTube.YouTubeSearchItem;
+import com.keltapps.missgsanchez.models.YouTube.YouTubeSearchSubItem;
+import com.keltapps.missgsanchez.models.YouTube.YouTubeVideoItem;
+import com.keltapps.missgsanchez.models.YouTube.YouTubeVideoSubItem;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -31,7 +37,6 @@ public class FeedDatabase extends SQLiteOpenHelper {
     public static final int RETURN_NO_OLD_POST = 0;
     public static final int RETURN_OLD_POST = 1;
     public static final int RETURN_EMPTY_PAGE = 2;
-    public static final String RETURN_INSTAGRAM_OLD_POST = "oldPost";
 
     public static final String DATABASE_NAME = "Feed.db";
 
@@ -57,6 +62,7 @@ public class FeedDatabase extends SQLiteOpenHelper {
         db.execSQL(ScriptDatabase.CREATE_BLOG);
         db.execSQL(ScriptDatabase.CREATE_PHOTOS_BLOG);
         db.execSQL(ScriptDatabase.CREATE_INSTAGRAM);
+        db.execSQL(ScriptDatabase.CREATE_YOUTUBE);
     }
 
     @Override
@@ -64,6 +70,7 @@ public class FeedDatabase extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + ScriptDatabase.BLOG_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ScriptDatabase.PHOTOS_BLOG_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ScriptDatabase.INSTAGRAM_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ScriptDatabase.YOUTUBE_TABLE_NAME);
         onCreate(db);
     }
 
@@ -103,11 +110,11 @@ public class FeedDatabase extends SQLiteOpenHelper {
 
 
     private void updateEntry(int id,
-                            int idPost,
-                            String title,
-                            String date,
-                            String textEs,
-                            String url) {
+                             int idPost,
+                             String title,
+                             String date,
+                             String textEs,
+                             String url) {
 
         ContentValues values = new ContentValues();
         values.put(ScriptDatabase.ColumnBlog.ID_POST, idPost);
@@ -148,9 +155,9 @@ public class FeedDatabase extends SQLiteOpenHelper {
                     updateEntry(
                             c.getInt(c.getColumnIndex(ScriptDatabase.ColumnBlog.ID)),
                             match.getIdPost(),
-                            match.getJsonRenderedTitle().getString(),
+                            match.getBlogRenderedTitle().getString(),
                             match.getDatePost(),
-                            match.getJsonRenderedContent().getString(),
+                            match.getBlogRenderedContent().getString(),
                             match.getUrl()
                     );
 
@@ -159,15 +166,15 @@ public class FeedDatabase extends SQLiteOpenHelper {
         }
         c.close();
         for (BlogItem article : entryMap.values()) {
-            Log.i(TAG, "insert article: " + article.getJsonRenderedContent().getString());
+            //    Log.i(TAG, "insert article: " + article.getBlogRenderedContent().getString());
             insertEntry(
                     article.getIdPost(),
-                    article.getJsonRenderedTitle().getString(),
+                    article.getBlogRenderedTitle().getString(),
                     article.getDatePost(),
-                    article.getJsonRenderedContent().getString(),
+                    article.getBlogRenderedContent().getString(),
                     article.getUrl()
             );
-            synchronizePhotosBlog(article.getIdPost(), article.getJsonRenderedContent().getString());
+            synchronizePhotosBlog(article.getIdPost(), article.getBlogRenderedContent().getString());
         }
 
         return oldPost ? RETURN_OLD_POST : RETURN_NO_OLD_POST;
@@ -223,7 +230,7 @@ public class FeedDatabase extends SQLiteOpenHelper {
 
 
     private void insertInstagram(String idPost, String urlProfilePhoto, String user, String location,
-                                int time, String urlPhoto, int likes, String title) {
+                                 int time, String urlPhoto, String urlVideo, int likes, String title) {
 
         ContentValues values = new ContentValues();
         values.put(ScriptDatabase.ColumnInstagram.ID_POST, idPost);
@@ -232,6 +239,7 @@ public class FeedDatabase extends SQLiteOpenHelper {
         values.put(ScriptDatabase.ColumnInstagram.LOCATION, location);
         values.put(ScriptDatabase.ColumnInstagram.TIME, time);
         values.put(ScriptDatabase.ColumnInstagram.URL_PHOTO, urlPhoto);
+        values.put(ScriptDatabase.ColumnInstagram.URL_VIDEO, urlVideo);
         values.put(ScriptDatabase.ColumnInstagram.LIKES, likes);
         values.put(ScriptDatabase.ColumnInstagram.TITLE, title);
 
@@ -243,7 +251,7 @@ public class FeedDatabase extends SQLiteOpenHelper {
     }
 
     private void updateInstagram(int id, String idPost, String urlProfilePhoto, String user, String location,
-                                int time, String urlPhoto, int likes, String title) {
+                                 int time, String urlPhoto, String urlVideo, int likes, String title) {
 
         ContentValues values = new ContentValues();
         values.put(ScriptDatabase.ColumnInstagram.ID_POST, idPost);
@@ -252,6 +260,7 @@ public class FeedDatabase extends SQLiteOpenHelper {
         values.put(ScriptDatabase.ColumnInstagram.LOCATION, location);
         values.put(ScriptDatabase.ColumnInstagram.TIME, time);
         values.put(ScriptDatabase.ColumnInstagram.URL_PHOTO, urlPhoto);
+        values.put(ScriptDatabase.ColumnInstagram.URL_VIDEO, urlVideo);
         values.put(ScriptDatabase.ColumnInstagram.LIKES, likes);
         values.put(ScriptDatabase.ColumnInstagram.TITLE, title);
 
@@ -275,22 +284,25 @@ public class FeedDatabase extends SQLiteOpenHelper {
         Type fooType = new TypeToken<InstagramItem>() {
         }.getType();
         InstagramItem instagramItem = new GsonBuilder().create().fromJson(data, fooType);
-        if(!instagramItem.isMoreAvailable())
+        if (!instagramItem.isMoreAvailable())
             return RETURN_EMPTY_PAGE;
-        HashMap<String, InstagramItem.InstagramSubItem> entryMap = new HashMap<>();
-        List<InstagramItem.InstagramSubItem> instagramSubItems = instagramItem.getListSubItem();
-        for (InstagramItem.InstagramSubItem instagramSubItem : instagramSubItems)
+        HashMap<String, InstagramSubItem> entryMap = new HashMap<>();
+        List<InstagramSubItem> instagramSubItems = instagramItem.getListSubItem();
+        for (InstagramSubItem instagramSubItem : instagramSubItems)
             entryMap.put(instagramSubItem.getId(), instagramSubItem);
         Cursor c = getInstagram();
         assert c != null;
 
         while (c.moveToNext()) {
             String postId = c.getString(c.getColumnIndex(ScriptDatabase.ColumnInstagram.ID_POST));
-            InstagramItem.InstagramSubItem match = entryMap.get(postId);
+            InstagramSubItem match = entryMap.get(postId);
             if (match != null) {
                 entryMap.remove(postId);
                 intReturn = RETURN_OLD_POST;
                 if (!match.getId().equals(postId)) {
+                    String urlVideo = null;
+                    if (match.getInstagramVideos() != null)
+                        urlVideo = match.getInstagramVideos().getStandard_resolution().getUrl();
                     updateInstagram(
                             c.getInt(c.getColumnIndex(ScriptDatabase.ColumnInstagram.ID)),
                             match.getId(),
@@ -299,20 +311,22 @@ public class FeedDatabase extends SQLiteOpenHelper {
                             match.getLocation().getName(),
                             match.getTime(),
                             match.getInstagramImages().getStandard_resolution().getUrl(),
+                            urlVideo,
                             match.getInstagramLikes().getCount(),
-                            match.getCaption().getTitle()
+                            match.getInstagramCaption().getTitle()
                     );
 
                 }
             }
         }
         c.close();
-        for (InstagramItem.InstagramSubItem article : entryMap.values()) {
-            Log.i(TAG, "insert instagram: " + article.getId());
-            String location= "";
-            if( article.getLocation() != null)
+        for (InstagramSubItem article : entryMap.values()) {
+            String location = "";
+            if (article.getLocation() != null)
                 location = article.getLocation().getName();
-
+            String urlVideo = null;
+            if (article.getInstagramVideos() != null)
+                urlVideo = article.getInstagramVideos().getStandard_resolution().getUrl();
             insertInstagram(
                     article.getId(),
                     article.getInstagramUser().getProfilePicture(),
@@ -320,12 +334,116 @@ public class FeedDatabase extends SQLiteOpenHelper {
                     location,
                     article.getTime(),
                     article.getInstagramImages().getStandard_resolution().getUrl(),
+                    urlVideo,
                     article.getInstagramLikes().getCount(),
-                    article.getCaption().getTitle()
+                    article.getInstagramCaption().getTitle()
             );
         }
         return intReturn;
     }
 
+
+    private void insertYouTube(String idYouTube, String publishedAt, String title, String thumbnails,
+                               String description, String duration, int viewCount, int likeCount) {
+
+        ContentValues values = new ContentValues();
+        values.put(ScriptDatabase.ColumnYouTube.ID_YOUTUBE, idYouTube);
+        values.put(ScriptDatabase.ColumnYouTube.PUBLISHED_AT, publishedAt);
+        values.put(ScriptDatabase.ColumnYouTube.TITLE_YOUTUBE, title);
+        values.put(ScriptDatabase.ColumnYouTube.THUMBNAILS, thumbnails);
+        values.put(ScriptDatabase.ColumnYouTube.DESCRIPTION, description);
+        values.put(ScriptDatabase.ColumnYouTube.DURATION, duration);
+        values.put(ScriptDatabase.ColumnYouTube.VIEW_COUNT, viewCount);
+        values.put(ScriptDatabase.ColumnYouTube.LIKE_COUNT, likeCount);
+
+        getWritableDatabase().insert(
+                ScriptDatabase.YOUTUBE_TABLE_NAME,
+                null,
+                values
+        );
+    }
+
+    private void updateYouTube(int id, String idYouTube, String publishedAt, String title, String thumbnails,
+                               String description, String duration, int viewCount, int likeCount) {
+
+        ContentValues values = new ContentValues();
+        values.put(ScriptDatabase.ColumnYouTube.ID_YOUTUBE, idYouTube);
+        values.put(ScriptDatabase.ColumnYouTube.PUBLISHED_AT, publishedAt);
+        values.put(ScriptDatabase.ColumnYouTube.TITLE_YOUTUBE, title);
+        values.put(ScriptDatabase.ColumnYouTube.THUMBNAILS, thumbnails);
+        values.put(ScriptDatabase.ColumnYouTube.DESCRIPTION, description);
+        values.put(ScriptDatabase.ColumnYouTube.DURATION, duration);
+        values.put(ScriptDatabase.ColumnYouTube.VIEW_COUNT, viewCount);
+        values.put(ScriptDatabase.ColumnYouTube.LIKE_COUNT, likeCount);
+
+        getWritableDatabase().update(
+                ScriptDatabase.YOUTUBE_TABLE_NAME,
+                values,
+                ScriptDatabase.ColumnBlog.ID + "=?",
+                new String[]{String.valueOf(id)});
+
+    }
+
+
+    private Cursor getYouTube() {
+        return getWritableDatabase().rawQuery(
+                "select * from " + ScriptDatabase.YOUTUBE_TABLE_NAME, null);
+    }
+
+
+    public List<String> synchronizeYouTubeSearch(String data) {
+        List<String> returnList = new LinkedList<>();
+        Type fooType = new TypeToken<YouTubeSearchItem>() {
+        }.getType();
+        YouTubeSearchItem youTubeSearchItem = new GsonBuilder().create().fromJson(data, fooType);
+        HashMap<String, YouTubeSearchSubItem> entryMap = new HashMap<>();
+        List<YouTubeSearchSubItem> youTubeSearchSubItems = youTubeSearchItem.getYouTubeSearchSubItems();
+        for (YouTubeSearchSubItem youTubeSearchSubItem : youTubeSearchSubItems)
+            entryMap.put(youTubeSearchSubItem.getId().getVideoId(), youTubeSearchSubItem);
+        Cursor c = getYouTube();
+        assert c != null;
+        while (c.moveToNext()) {
+            String idYoutube = c.getString(c.getColumnIndex(ScriptDatabase.ColumnYouTube.ID_YOUTUBE));
+            YouTubeSearchSubItem match = entryMap.get(idYoutube);
+            if (match != null)
+                entryMap.remove(idYoutube);
+        }
+        c.close();
+        for (YouTubeSearchSubItem youTubeSearchSubItem : entryMap.values()) {
+            returnList.add(youTubeSearchSubItem.getId().getVideoId());
+        }
+        return returnList;
+    }
+
+    public String synchronizeYouTubeVideo(String data) {
+        String publishedAt = null;
+        Type fooType = new TypeToken<YouTubeVideoItem>() {
+        }.getType();
+        YouTubeVideoItem youTubeVideoItem = new GsonBuilder().create().fromJson(data, fooType);
+        List<YouTubeVideoSubItem> youTubeVideoSubItems = youTubeVideoItem.getYouTubeVideoSubItems();
+        for (YouTubeVideoSubItem article : youTubeVideoSubItems) {
+            insertYouTube(
+                    article.getIdYouTube(),
+                    article.getYouTubeSnippet().getPublishedAt(),
+                    article.getYouTubeSnippet().getTitle(),
+                    article.getYouTubeSnippet().getYouTubeThumbnails().getYouTubeThumbnailsHigh().getUrl(),
+                    article.getYouTubeSnippet().getDescription(),
+                    article.getYouTubeContentDetails().getDuration(),
+                    article.getYouTubeStatistics().getViewCount(),
+                    article.getYouTubeStatistics().getLikeCount()
+            );
+        }
+        return publishedAt;
+    }
+
+    public String synchronizeYouTubeSearchChannel(String data) {
+        Type fooType = new TypeToken<YouTubeSearchChannelItem>() {
+        }.getType();
+        YouTubeSearchChannelItem youTubeSearchChannelItem = new GsonBuilder().create().fromJson(data, fooType);
+        List<YouTubeSearchChannelSubItem> youTubeSearchChannelSubItem = youTubeSearchChannelItem.getYouTubeSearchChannelSubItems();
+        if (youTubeSearchChannelSubItem.isEmpty())
+            return "";
+        return youTubeSearchChannelSubItem.get(0).getYouTubeSnippet().getYouTubeThumbnails().getYouTubeThumbnailsHigh().getUrl();
+    }
 
 }

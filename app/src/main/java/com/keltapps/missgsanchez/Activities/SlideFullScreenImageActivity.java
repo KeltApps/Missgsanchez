@@ -1,4 +1,4 @@
-package com.keltapps.missgsanchez;
+package com.keltapps.missgsanchez.Activities;
 
 import android.content.Intent;
 import android.os.Build;
@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.keltapps.missgsanchez.R;
 import com.keltapps.missgsanchez.views.adapters.SlideFullScreenImagePagerAdapter;
 
 import java.util.List;
@@ -84,7 +85,7 @@ public class SlideFullScreenImageActivity extends AppCompatActivity {
                     .from(this)
                     .setType("text/plain")
                     .setText(urlImage)
-                    .getIntent();
+                    .createChooserIntent();
             if (shareIntent.resolveActivity(
                     this.getPackageManager()) != null)
                 startActivity(shareIntent);

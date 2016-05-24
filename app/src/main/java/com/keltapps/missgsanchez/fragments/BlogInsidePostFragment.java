@@ -102,7 +102,7 @@ public class BlogInsidePostFragment extends Fragment {
                         .from(getActivity())
                         .setType("text/plain")
                         .setText(sTitle + "\n" + urlPost)
-                        .getIntent();
+                        .createChooserIntent();
                 if (shareIntent.resolveActivity(
                         getActivity().getPackageManager()) != null)
                     startActivity(shareIntent);
@@ -142,7 +142,7 @@ public class BlogInsidePostFragment extends Fragment {
         anim.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+                ((AppCompatActivity) getContext()).setSupportActionBar(toolbar);
             }
         });
         anim.setInterpolator(new DecelerateInterpolator());

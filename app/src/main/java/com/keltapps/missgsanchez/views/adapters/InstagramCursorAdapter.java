@@ -3,11 +3,13 @@ package com.keltapps.missgsanchez.views.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,7 @@ import com.keltapps.missgsanchez.R;
 import com.keltapps.missgsanchez.network.LoadImages;
 import com.keltapps.missgsanchez.utils.ScriptDatabase;
 import com.keltapps.missgsanchez.views.CircleTransform;
+import com.keltapps.missgsanchez.views.MyVideoView;
 import com.squareup.picasso.Picasso;
 
 import org.ocpsoft.prettytime.PrettyTime;
@@ -37,6 +40,7 @@ public class InstagramCursorAdapter extends CursorAdapter implements StickyListH
         super(context, c, 0);
         this.context = context;
         mCursor = c;
+
     }
 
     @Override
@@ -62,8 +66,23 @@ public class InstagramCursorAdapter extends CursorAdapter implements StickyListH
 
         }
         title.setText(hashText);
-
-
+        ViewGroup frameLayout = (ViewGroup) view.findViewById(R.id.item_instagram_body_frameLayout);
+        String urlVideo = cursor.getString(cursor.getColumnIndex(ScriptDatabase.ColumnInstagram.URL_VIDEO));
+        if (urlVideo != null) {
+            final MyVideoView video = new MyVideoView(context);
+            frameLayout.addView(video);
+            video.setVideoURI(Uri.parse(urlVideo));
+            frameLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("AAA", "onClick: ");
+                    video.exchangeVolume();
+                }
+            });
+        } else {
+            if (frameLayout.getChildCount() == 2)
+                frameLayout.removeViewAt(1);
+        }
     }
 
 
@@ -88,11 +107,8 @@ public class InstagramCursorAdapter extends CursorAdapter implements StickyListH
         if (location.equals(""))
             holder.userLocation.setText(user);
         else {
-            //holder.userLocation.setText(context.getString(R.string.instagram_userLocation, user, location));
-
             Spannable wordToSpan = new SpannableString(context.getString(R.string.instagram_userLocation, user, location));
-            wordToSpan.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorLink)), user.length(),wordToSpan.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
+            wordToSpan.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorLink)), user.length(), wordToSpan.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             holder.userLocation.setText(wordToSpan);
         }
         long time = mCursor.getInt(mCursor.getColumnIndex(ScriptDatabase.ColumnInstagram.TIME));

@@ -240,6 +240,8 @@ public class BlogCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView.Vi
         private void changeToInsideFragment(Cursor cursor, int position, int positionCursorPhotos) {
             List<String> listPhotos = new ArrayList<>();
             Cursor cursorPhotos = cursorPagerAdapter.getCursorPhotos();
+            if(cursorPhotos == null)
+                return;
             int cursorPhotosPosition = cursorPhotos.getPosition();
             if (cursorPhotos.moveToFirst()) {
                 do {

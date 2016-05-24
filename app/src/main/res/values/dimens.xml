@@ -29,4 +29,7 @@
     <dimen name="instagramHeader.height">54dp</dimen>
     <dimen name="instagramHeader.heightPhoto">34dp</dimen>
     <dimen name="instagramHeader.verticalMargin">8dp</dimen>
+    <!--Item youtube-->
+    <dimen name="youtubeItem.imageView.height">200dp</dimen>
+    <dimen name="youtubeItem.header.heightPhoto">34dp</dimen>
 </resources>

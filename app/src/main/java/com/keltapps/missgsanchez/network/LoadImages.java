@@ -3,6 +3,7 @@ package com.keltapps.missgsanchez.network;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.squareup.picasso.NetworkPolicy;
@@ -23,6 +24,7 @@ public class LoadImages {
     public static void setImage(final Context context, final String urlFullResolution, final String urlLowResolution, final ImageView imageView) {
         final Picasso picasso = Picasso.with(context);
         // picasso.setIndicatorsEnabled(true);
+        Log.d("prueba", "setImage: full: " + urlFullResolution +"  low: " + urlLowResolution);
         ConnectivityManager connMgr = (ConnectivityManager)
                 context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -33,11 +35,12 @@ public class LoadImages {
                     .into(imageView, new com.squareup.picasso.Callback() {
                         @Override
                         public void onSuccess() {
-
+                            Log.d("prueba", "onSuccess: " + urlFullResolution);
                         }
 
                         @Override
                         public void onError() {
+                            Log.d("prueba", "onError: ");
                             Picasso.with(context)
                                     .load(urlLowResolution)
                                     .fit()

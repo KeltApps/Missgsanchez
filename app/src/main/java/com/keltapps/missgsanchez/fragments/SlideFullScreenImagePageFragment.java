@@ -30,7 +30,6 @@ public class SlideFullScreenImagePageFragment extends Fragment {
 
         final View imageView = rootView.findViewById(R.id.fragment_slide_full_screen_image_view);
 
-
         Log.d(TAG, "onCreateView: ");
 
         final View decorView = getActivity().getWindow().getDecorView();

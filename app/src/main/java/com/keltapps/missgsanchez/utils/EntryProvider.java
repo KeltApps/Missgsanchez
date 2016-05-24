@@ -16,14 +16,18 @@ public class EntryProvider extends ContentProvider {
     private static final String uri = prefix_content + prefix_uri + "/" + ScriptDatabase.BLOG_TABLE_NAME;
     private static final String uri_photos = prefix_content + prefix_uri + "/" + ScriptDatabase.PHOTOS_BLOG_TABLE_NAME;
     private static final String uri_instagram = prefix_content + prefix_uri + "/" + ScriptDatabase.INSTAGRAM_TABLE_NAME;
+    private static final String uri_youtube = prefix_content + prefix_uri + "/" + ScriptDatabase.YOUTUBE_TABLE_NAME;
     private static final String suffix_uri_limit = "/limit";
     private static final String uri_limit = prefix_content + prefix_uri + "/" + ScriptDatabase.BLOG_TABLE_NAME + suffix_uri_limit;
     private static final String uri_instagram_limit = prefix_content + prefix_uri + "/" + ScriptDatabase.INSTAGRAM_TABLE_NAME + suffix_uri_limit;
+    private static final String uri_youtube_limit = prefix_content + prefix_uri + "/" + ScriptDatabase.YOUTUBE_TABLE_NAME + suffix_uri_limit;
     public static final Uri CONTENT_URI = Uri.parse(uri);
     public static final Uri CONTENT_URI_LIMIT = Uri.parse(uri_limit);
     public static final Uri CONTENT_URI_PHOTOS = Uri.parse(uri_photos);
     public static final Uri CONTENT_URI_INSTAGRAM = Uri.parse(uri_instagram);
     public static final Uri CONTENT_URI_INSTAGRAM_LIMIT = Uri.parse(uri_instagram_limit);
+    public static final Uri CONTENT_URI_YOUTUBE = Uri.parse(uri_youtube);
+    public static final Uri CONTENT_URI_YOUTUBE_LIMIT = Uri.parse(uri_youtube_limit);
     private static final String MIME_LIST = "vnd.android.cursor.dir/vnd.missgsanchez.entry";
     private static final String MIME_UNIQUE = "vnd.android.cursor.item/vnd.missgsanchez.entry";
 
@@ -36,6 +40,8 @@ public class EntryProvider extends ContentProvider {
     private static final int PHOTOS = 4;
     private static final int INSTAGRAM = 5;
     private static final int INSTAGRAM_LIMIT = 6;
+    private static final int YOUTUBE = 7;
+    private static final int YOUTUBE_LIMIT = 8;
     private static final UriMatcher uriMatcher;
 
     //Initialize UriMatcher
@@ -47,6 +53,8 @@ public class EntryProvider extends ContentProvider {
         uriMatcher.addURI(prefix_uri, ScriptDatabase.PHOTOS_BLOG_TABLE_NAME, PHOTOS);
         uriMatcher.addURI(prefix_uri, ScriptDatabase.INSTAGRAM_TABLE_NAME, INSTAGRAM);
         uriMatcher.addURI(prefix_uri, ScriptDatabase.INSTAGRAM_TABLE_NAME + suffix_uri_limit + "/#", INSTAGRAM_LIMIT);
+        uriMatcher.addURI(prefix_uri, ScriptDatabase.YOUTUBE_TABLE_NAME, YOUTUBE);
+        uriMatcher.addURI(prefix_uri, ScriptDatabase.YOUTUBE_TABLE_NAME + suffix_uri_limit + "/#", YOUTUBE_LIMIT);
     }
 
 
@@ -80,6 +88,12 @@ public class EntryProvider extends ContentProvider {
             case INSTAGRAM_LIMIT:
                 return feedDatabase.getWritableDatabase().query(ScriptDatabase.INSTAGRAM_TABLE_NAME, projection, where,
                         selectionArgs, null, null, sortOrder, uri.getLastPathSegment());
+            case YOUTUBE:
+                return feedDatabase.getWritableDatabase().query(ScriptDatabase.YOUTUBE_TABLE_NAME, projection, where,
+                        selectionArgs, null, null, sortOrder);
+            case YOUTUBE_LIMIT:
+                return feedDatabase.getWritableDatabase().query(ScriptDatabase.YOUTUBE_TABLE_NAME, projection, where,
+                        selectionArgs, null, null, sortOrder, uri.getLastPathSegment());
             default:
                 return null;
         }
@@ -100,6 +114,10 @@ public class EntryProvider extends ContentProvider {
             case INSTAGRAM:
                 return MIME_LIST;
             case INSTAGRAM_LIMIT:
+                return MIME_LIST;
+            case YOUTUBE:
+                return MIME_LIST;
+            case YOUTUBE_LIMIT:
                 return MIME_LIST;
             default:
                 return null;
@@ -122,6 +140,10 @@ public class EntryProvider extends ContentProvider {
             case INSTAGRAM:
             case INSTAGRAM_LIMIT:
                 regId = feedDatabase.getWritableDatabase().insert(ScriptDatabase.INSTAGRAM_TABLE_NAME, null, values);
+                break;
+            case YOUTUBE:
+            case YOUTUBE_LIMIT:
+                regId = feedDatabase.getWritableDatabase().insert(ScriptDatabase.YOUTUBE_TABLE_NAME, null, values);
                 break;
             default:
                 return null;
@@ -146,6 +168,10 @@ public class EntryProvider extends ContentProvider {
                 return feedDatabase.getWritableDatabase().delete(ScriptDatabase.INSTAGRAM_TABLE_NAME, where, selectionArgs);
             case INSTAGRAM_LIMIT:
                 return feedDatabase.getWritableDatabase().delete(ScriptDatabase.INSTAGRAM_TABLE_NAME, where, selectionArgs);
+            case YOUTUBE:
+                return feedDatabase.getWritableDatabase().delete(ScriptDatabase.YOUTUBE_TABLE_NAME, where, selectionArgs);
+            case YOUTUBE_LIMIT:
+                return feedDatabase.getWritableDatabase().delete(ScriptDatabase.YOUTUBE_TABLE_NAME, where, selectionArgs);
             default:
                 return 0;
         }
@@ -168,6 +194,10 @@ public class EntryProvider extends ContentProvider {
                 return feedDatabase.getWritableDatabase().update(ScriptDatabase.INSTAGRAM_TABLE_NAME, values, where, selectionArgs);
             case INSTAGRAM_LIMIT:
                 return feedDatabase.getWritableDatabase().update(ScriptDatabase.INSTAGRAM_TABLE_NAME, values, where, selectionArgs);
+            case YOUTUBE:
+                return feedDatabase.getWritableDatabase().update(ScriptDatabase.YOUTUBE_TABLE_NAME, values, where, selectionArgs);
+            case YOUTUBE_LIMIT:
+                return feedDatabase.getWritableDatabase().update(ScriptDatabase.YOUTUBE_TABLE_NAME, values, where, selectionArgs);
             default:
                 return 0;
         }

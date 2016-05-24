@@ -17,6 +17,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.keltapps.missgsanchez.R;
+import com.keltapps.missgsanchez.network.InstagramAPI;
 import com.keltapps.missgsanchez.network.VolleySingleton;
 import com.keltapps.missgsanchez.utils.EntryProvider;
 import com.keltapps.missgsanchez.utils.FeedDatabase;
@@ -42,7 +43,7 @@ public class InstagramTabFragment extends Fragment implements LoaderManager.Load
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_instagram, container, false);
         VolleySingleton.getInstance(getActivity()).addToRequestQueue(new StringRequest(Request.Method.GET,
-                VolleySingleton.URL_GET_INSTAGRAM,
+                InstagramAPI.getMediaUrlGet(null),
                 InstagramTabFragment.this, InstagramTabFragment.this));
         stickyList = (StickyListHeadersListView) rootView.findViewById(R.id.fragment_instagram_list);
 
@@ -86,8 +87,8 @@ public class InstagramTabFragment extends Fragment implements LoaderManager.Load
             bundle.putInt(TAG_LIMIT_QUERY, 0);
             getLoaderManager().initLoader(0, bundle, this);
         } else {
-            bundle.putInt(TAG_LIMIT_QUERY, totalItemCount + VolleySingleton.INSTAGRAM_POST_PER_PAGE);
-            getLoaderManager().initLoader(totalItemCount + VolleySingleton.INSTAGRAM_POST_PER_PAGE, bundle, this);
+            bundle.putInt(TAG_LIMIT_QUERY, totalItemCount + InstagramAPI.getMediaPostPerPage());
+            getLoaderManager().initLoader(totalItemCount + InstagramAPI.getMediaPostPerPage(), bundle, this);
         }
     }
 
@@ -127,7 +128,7 @@ public class InstagramTabFragment extends Fragment implements LoaderManager.Load
                                 loading = false;
                                 if (!maxId.equals(""))
                                     VolleySingleton.getInstance(getActivity()).addToRequestQueue(new StringRequest(Request.Method.GET,
-                                            VolleySingleton.URL_GET_INSTAGRAM + VolleySingleton.ARGUMENT_INSTAGRAM_MAX_ID + maxId,
+                                            InstagramAPI.getMediaUrlGet(maxId),
                                             InstagramTabFragment.this, InstagramTabFragment.this));
                             }
                         }

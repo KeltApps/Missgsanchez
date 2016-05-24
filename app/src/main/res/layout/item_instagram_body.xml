@@ -4,27 +4,31 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.keltapps.missgsanchez.views.SquareImageView
-        android:id="@+id/item_instagram_body_imageView"
+    <FrameLayout
+        android:id="@+id/item_instagram_body_frameLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content">
 
-
-
-        <TextView
-            android:id="@+id/item_instagram_body_textView_likes"
+        <com.keltapps.missgsanchez.views.SquareImageView
+            android:id="@+id/item_instagram_body_imageView"
             android:layout_width="match_parent"
-            android:textColor="@color/colorAccent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/instagramHeader.verticalMargin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/instagramHeader.verticalMargin"
-            android:layout_marginLeft="@dimen/activity_horizontal_small_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_small_margin"
-            android:drawableLeft="@drawable/heart"
-            android:drawablePadding="10dp"
-            />
+            android:layout_height="wrap_content" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/item_instagram_body_textView_likes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_small_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_small_margin"
+        android:drawableLeft="@drawable/heart"
+        android:drawablePadding="10dp"
+        android:paddingBottom="@dimen/instagramHeader.verticalMargin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/instagramHeader.verticalMargin"
+        android:textColor="@color/colorAccent" />
 
     <TextView
         android:id="@+id/item_instagram_body_textView_title"
